@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order history</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+    />
+    <link id="theme-style" rel="stylesheet" href="/css/dashboard.css" />
+  </head>
+
+  <body>
+    <div class="container mt-5">
+      <div class="container">
+        <section id="products">
+          <div class="container">
+            <h2>Total Orders</h2>
+
+            <div class="container mb-3">
+              <a href="/home" class="nav-link btn btn-primary d-inline p-2 ">
+                Home
+              </a>
+            </div>
+            <%for(let i =0;i<data.length;i++) {%>
+            <div class="d-flex flex-column border mb-3 p-2">
+              <div class="container"><span class="font-weight-bold h5">Order Id :</span><span  class="font-weight-bold h5">
+                <%= data[i].id %></span></div>
+                <% for(let j=0;j<productdeatils.length;j++){ %>
+                  <% if(data[i].id==productdeatils[j].orderId) { %>
+              <div
+                class="d-flex flex-row justify-content-between align-items-center mobile"
+              >
+                <div class="d-flex flex-row mt-2 justify-content-end ">
+                  <div class="flex-column">
+                    <img
+                      src="/uploads/<%=productdeatils[j].Product.image%>"
+                     
+                      alt=""
+                      class="imgwidth img-thumbnail "
+                      id="image"
+                    />
+                  </div>
+                  <div class="d-flex flex-column ">
+                    <div>
+                      <h6 class=""><%=productdeatils[j].Product.ProductName %></h6>
+                    </div>
+                    <div>
+                      Description:
+                      <div class="pl-2">
+                        <p><%=productdeatils[j].Product.description %></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="pl-md-0 pl-1">₹ <span><%=productdeatils[j].Product.price %> </span></div>
+                <div class="pl-md-0 pl-1"><span> X </span></div>
+                <div class="pl-md-0 pl-2">
+                  <span class="px-md-3 px-1" id="quantity"><%=productdeatils[j].quantity %> </span>
+                </div>
+                <span> = </span>
+                <div class="pl-md-0 pl-1">₹<span><%=productdeatils[j].Product.price * productdeatils[j].quantity%>  </span></div>
+              </div>
+              <br/>
+              <% } %>
+              <% } %>
+              
+              <div class="container">
+                <p>Total Order Price :  ₹<span> <%=data[i].totalPrice %></span></p>
+                
+              </div>
+            </div>
+            <% } %>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+      crossorigin="anonymous"
+    ></script>
+
+    <script></script>
+  </body>
+</html>

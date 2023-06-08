@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Users</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"
+    />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="/css/dashboard.css" />
+  </head>
+
+  <body onload="navbar_changer('Users');">
+    <%- include('navbar.ejs') %>
+    <div class="app-wrapper">
+      <!-- <div class="container">
+        <input
+          type="text"
+          id="search"
+          class="bg-light border rounded-pill p-2"
+          oninput="searchQuery(this,1);"
+          placeholder="Search"
+        /><span class="fa fa-search text-muted"></span>
+      </div> -->
+
+      <div class="container mt-4">
+        <div class="action-btn my-3">
+          <div class="createbtn">
+            <a type="button" class="btn btn-success" onclick="showCreateModal()"
+              >Create User</a
+            >
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover" id="myTable">
+            <thead>
+              <tr>
+                <!-- <th>#</th>      -->
+                <th>UserId</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th class="text-center" width="4%">Option</th>
+                <th width="4%"></th>
+              </tr>
+            </thead>
+            <tbody class="userData"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="container">
+        <ul class="pagination"></ul>
+      </div>
+
+      <div
+        class="modal fade"
+        id="create-model"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog mx-0 mx-sm-auto">
+          <div class="modal-content">
+            <div class="modal-header bg-primary">
+              <h5 class="modal-title text-white" id="exampleModalLabel">
+                Add Data
+              </h5>
+              <button
+                type="button"
+                class="btn-close text-white"
+                data-mdb-dismiss="modal"
+                aria-label="Close"
+                onclick="createdisableModal()"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form role="form" onsubmit="InsertData(); return false;">
+                <div>
+                  <div class="form-outline mb-4">
+                    <label class="form-label" for="username"> Name:</label>
+                    <div class="form-text mb-2">
+                      <input
+                        class="form-control form-control-sm"
+                        type="text"
+                        name="createname"
+                        id="createname"
+                        autocomplete="off"
+                        required
+                      />
+                    </div>
+                    <small class="warn" id="createnameErr"></small>
+                  </div>
+                  <div class="form-outline mb-4">
+                    <label class="form-label" for="useremail">Email:</label>
+                    <div class="form-text mb-2">
+                      <input
+                        class="form-control form-control-sm"
+                        type="email"
+                        name="createemail"
+                        id="createemail"
+                        autocomplete="off"
+                        required
+                      />
+                    </div>
+                    <small class="warn" id="createmailErr"></small>
+                  </div>
+                  <div class="form-outline mb-4">
+                    <label class="form-label" for="useremail">Password:</label>
+                    <div class="form-text mb-2">
+                      <input
+                        class="form-control form-control-sm"
+                        type="password"
+                        name="createpassword"
+                        id="createpassword"
+                        autocomplete="off"
+                        onkeyup="validatePassword()"
+                        required
+                      />
+                    </div>
+                    <small class="warn" id="passwordErr"></small>
+                  </div>
+                  <div class="form-outline mb-4">
+                    <label class="form-label" for="useremail"
+                      >Confirm Password:</label
+                    >
+                    <div class="form-text mb-2">
+                      <input
+                        class="form-control form-control-sm"
+                        type="password"
+                        name="confirmpassword"
+                        id="confirmpassword"
+                        autocomplete="off"
+                        onkeyup="validatePassword()"
+                        required
+                      />
+                    </div>
+                    <small class="warn" id="passwordConfirmErr"></small>
+                  </div>
+                  <div class="form-outline mb-4">
+                    <div class="form-text mb-2">
+                      <select
+                        name="roles"
+                        class="form-control form-control-sm"
+                        id="roles"
+                        required
+                      >
+                        <option value="#">select Role</option>
+                        <option value="1">Admin</option>
+                        <option value="2">User</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary" id="createBtn">
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="modal fade"
+        id="editmodel"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog mx-0 mx-sm-auto">
+          <div class="modal-content">
+            <div class="modal-header bg-primary">
+              <h5 class="modal-title text-white" id="exampleModalLabel">
+                Edit Data
+              </h5>
+              <button
+                type="button"
+                class="btn-close text-white"
+                data-mdb-dismiss="modal"
+                aria-label="Close"
+                onclick="disableModal()"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form role="form" onsubmit=" dataUpdate(); return false;">
+                <div>
+                  <div class="form-outline mb-4">
+                    <label class="form-label" for="username"> Name:</label>
+                    <div class="form-text mb-2">
+                      <input
+                        class="form-control form-control-sm"
+                        type="text"
+                        name="username"
+                        id="username"
+                        autocomplete="off"
+                        onkeyup="validateName()"
+                      />
+                    </div>
+                    <small class="warn" id="username-err"></small>
+                  </div>
+                  <div class="form-outline mb-4">
+                    <label class="form-label" for="useremail">Email:</label>
+                    <div class="form-text mb-2">
+                      <input
+                        class="form-control form-control-sm"
+                        type="email"
+                        name="useremail"
+                        id="useremail"
+                        autocomplete="off"
+                        onkeyup="validateEmail()"
+                      />
+                    </div>
+                    <small class="warn" id="useremail-err"></small>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="usersBtn"
+                    disabled
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+    crossorigin="anonymous"
+  ></script>
+
+  <script src="/js/navbar.js"></script>
+  <script src="/js/user.js"></script>
+</html>
