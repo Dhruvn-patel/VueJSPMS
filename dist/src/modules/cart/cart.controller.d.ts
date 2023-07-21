@@ -7,13 +7,14 @@ export declare class CartController {
     displayOrder(req: any, res: any): Promise<any>;
     displayCart(req: any, res: any): Promise<any>;
     displayOrderHistory(req: any, res: any): Promise<any>;
-    getQuantityById(params: any, req: any, res: any): Promise<any>;
+    getQuantityById(params: any, req: any, res: any): Promise<void>;
     getAddInCart(req: any, res: any, data: any): Promise<any>;
-    updateQuantity(params: any, req: any, res: any): Promise<any>;
+    updateQuantity(params: any, req: any, res: any): Promise<void>;
     getCartData(req: any, res: any): Promise<any>;
     deleteSoft(req: any, res: any): Promise<any>;
     getDeleteItemsInCart(params: any, req: any, res: any): Promise<any>;
     addOrder(req: any, res: any, data: any): Promise<any>;
+    getRestoreCartData(req: any, res: any): Promise<any>;
     getAllOrder(req: any, res: any, data: any): Promise<any>;
     updateOrders(req: any, res: any): Promise<any>;
     lastData(req: any, res: any): Promise<any>;

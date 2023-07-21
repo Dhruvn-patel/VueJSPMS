@@ -32,12 +32,8 @@ export class CategoryController {
   }
 
   @Get('allCategories')
-  async findAllCategory(@Query() params: any, @Req() req, @Res() res) {
-    const { page, pageSize } = params;
-    const { data, totaldata } = await this.categoryService.getAllCategory(
-      Number(page),
-      Number(pageSize),
-    );
+  async findAllCategory(@Req() req, @Res() res) {
+    const { data, totaldata } = await this.categoryService.getAllCategory();
     return res.status(200).json({
       data: data,
       totaldata: totaldata,
@@ -133,7 +129,7 @@ export class CategoryController {
   @Get('datatable')
   async fetchCategory(@Req() req, @Res() res) {
     const categorydata = await this.categoryService.categoryListing(req);
-    console.log(categorydata);
+  
 
     res.json({
       data: categorydata.user,

@@ -19,7 +19,7 @@ async function bootstrap() {
     swagger_1.SwaggerModule.setup('api', app, document);
     app.useStaticAssets((0, path_1.join)(__dirname, '../../', 'public'));
     app.setBaseViewsDir((0, path_1.join)(__dirname, '../../', 'views'));
-    app.enableCors();
+    app.enableCors({ credentials: true, origin: true });
     app.use(session({
         secret: process.env.SESSION_SECRET,
         resave: true,
@@ -28,6 +28,7 @@ async function bootstrap() {
             maxAge: 500000,
         },
     }));
+    app.useBodyParser('json', { limit: '200mb' });
     app.useGlobalPipes(new common_1.ValidationPipe());
     app.use(cookieParser());
     app.setViewEngine('ejs');

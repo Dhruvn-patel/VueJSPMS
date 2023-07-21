@@ -46,6 +46,7 @@ let SignupController = class SignupController {
             const resdata = await this.signupService.signUp(authsignup, authsignup.googleId);
             console.log('resdata', resdata);
             if (resdata.errorCode == 409) {
+                console.log('402');
                 return res.status(409).json({
                     errmsg: 'Email is already registered',
                     data: null,
@@ -54,7 +55,7 @@ let SignupController = class SignupController {
             }
             else if (resdata.errorCode === 200) {
                 return res.status(200).json({
-                    errmsg: '',
+                    errmsg: 'Successfully signup',
                     data: resdata,
                     status: 200,
                 });

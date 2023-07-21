@@ -18,7 +18,7 @@ let ProductsService = class ProductsService {
     constructor(prismService) {
         this.prismService = prismService;
     }
-    async addProduct(product, categoryId) {
+    async addProduct(product, categoryId, userId) {
         const { ProductName, description, price, image, quantity } = product;
         try {
             const productdata = await this.prismService.product.create({
@@ -112,6 +112,38 @@ let ProductsService = class ProductsService {
             console.log(error.message);
         }
     }
+    async addProductWithImg(file, ProductName, description, price, quantity, categoryIds) {
+        const categoryIdArray = categoryIds
+            .split(',')
+            .map((id) => Number(id.trim()))
+            .filter((categoryId) => !isNaN(categoryId));
+        const categories = categoryIdArray.map((categoryId) => ({
+            id: Number(categoryId),
+        }));
+        try {
+            const data = await this.prismService.product.create({
+                data: {
+                    ProductName: ProductName,
+                    description,
+                    price: Number(price),
+                    quantity: Number(quantity),
+                    image: file,
+                    ProductCategory: {
+                        create: categories.map((category) => ({
+                            Categories: {
+                                connect: category,
+                            },
+                        })),
+                    },
+                },
+                include: { ProductCategory: true },
+            });
+            return data;
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+    }
     async productUpdateById(file, ProductName, description, price, quantity, categoryIds, productId) {
         const categoryIdArray = categoryIds
             .split(',')
@@ -151,6 +183,40 @@ let ProductsService = class ProductsService {
                     price: Number(price),
                     quantity: Number(quantity),
                     image: file.filename,
+                    ProductCategory: {
+                        create: categories.map((category) => ({
+                            Categories: {
+                                connect: category,
+                            },
+                        })),
+                    },
+                },
+                where: { id: Number(productId) },
+                include: { ProductCategory: true },
+            });
+            return data;
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+    }
+    async updateProductById(file, ProductName, description, price, quantity, categoryIds, productId) {
+        const categoryIdArray = categoryIds
+            .split(',')
+            .map((id) => Number(id.trim()))
+            .filter((categoryId) => !isNaN(categoryId));
+        const categories = categoryIdArray.map((categoryId) => ({
+            id: Number(categoryId),
+        }));
+        const isExists = await this.deleteCategory(productId);
+        try {
+            const data = await this.prismService.product.update({
+                data: {
+                    ProductName: ProductName,
+                    description,
+                    price: Number(price),
+                    quantity: Number(quantity),
+                    image: file,
                     ProductCategory: {
                         create: categories.map((category) => ({
                             Categories: {
@@ -236,14 +302,16 @@ let ProductsService = class ProductsService {
     }
     async findAllProducts(page, pageSize) {
         const skip = (Number(page) - 1) * Number(pageSize);
-        const take = pageSize;
         const totalData = await this.prismService.product.count({});
+        const take = totalData;
         try {
             const productsData = await this.prismService.product.findMany({
                 include: {
                     ProductCategory: {
                         include: {
-                            Categories: true,
+                            Categories: {
+                                select: { id: true, name: true },
+                            },
                         },
                     },
                 },
@@ -251,7 +319,7 @@ let ProductsService = class ProductsService {
                 take,
             });
             const productsWithCategory = productsData.map((product) => {
-                const categoryNames = product.ProductCategory.map((productCategory) => productCategory.Categories.name);
+                const categoryNames = product.ProductCategory.map((productCategory) => productCategory.Categories);
                 return {
                     id: product.id,
                     ProductName: product.ProductName,

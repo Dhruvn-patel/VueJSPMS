@@ -37,9 +37,6 @@ async function orderAdd() {
         window.location.href = '/cart/order'
 
     }
-
-
-
 }
 async function changeValues(element, type) {
     const productId = element.id;

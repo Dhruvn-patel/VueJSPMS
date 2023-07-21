@@ -1,7 +1,7 @@
 import { CreateUserDto } from './dto/create-user.dto';
 export declare class UserService {
     create(createUserDto: CreateUserDto, rolesId: number): Promise<any>;
-    findAll(page: number, pageSize: number): Promise<any>;
+    findAll(): Promise<any>;
     update(id: number, updatedata: any): Promise<{
         statusCode: number;
         email: string;

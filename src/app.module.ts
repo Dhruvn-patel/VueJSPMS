@@ -22,6 +22,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailModule } from './modules/mail/mail.module';
 import { JwtService } from '@nestjs/jwt';
 
+import { NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { CommonMiddleware } from './common/common.middleware';
 @Global()
 @Module({
   imports: [
@@ -64,4 +66,8 @@ import { JwtService } from '@nestjs/jwt';
     JwtService,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CommonMiddleware).forRoutes();
+  }
+}

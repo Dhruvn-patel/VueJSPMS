@@ -1,0 +1,43 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@mdi/font": "^7.2.96",
+    "@mdi/js": "^7.2.96",
+    "core-js": "^3.8.3",
+    "datatables.net-dt": "^1.13.5",
+    "datatables.net-responsive": "^2.5.0",
+    "datatables.net-select": "^1.7.0",
+    "datatables.net-vue3": "^2.1.1",
+    "jquery": "^3.7.0",
+    "jwt-decode": "^3.1.2",
+    "vue": "^3.2.13",
+    "vue-axios": "^3.5.2",
+    "vue-google-oauth2": "^1.5.10",
+    "vue-jwt-decode": "^0.1.0",
+    "vue-router": "^4.0.3",
+    "vue-sweetalert2": "^5.0.5",
+    "vuetify": "^3.3.7",
+    "vuex": "^4.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-plugin-router": "~5.0.0",
+    "@vue/cli-plugin-typescript": "~5.0.0",
+    "@vue/cli-plugin-vuex": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "@vue/eslint-config-typescript": "^9.1.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.0.3",
+    "typescript": "~4.5.5"
+  }
+}

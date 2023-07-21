@@ -27,7 +27,11 @@ const user_module_1 = require("./modules/user/user.module");
 const config_1 = require("@nestjs/config");
 const mail_module_1 = require("./modules/mail/mail.module");
 const jwt_1 = require("@nestjs/jwt");
+const common_middleware_1 = require("./common/common.middleware");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer.apply(common_middleware_1.CommonMiddleware).forRoutes();
+    }
 };
 AppModule = __decorate([
     (0, common_1.Global)(),

@@ -76,31 +76,14 @@ let CartController = class CartController {
         });
         const { email, name, userId } = dataget;
         const { id } = params;
-        const data = await this.cartService.getQuantityById(id, userId);
-        return res.json({ data });
     }
     async getAddInCart(req, res, data) {
-        const { token } = req.cookies['JWT_TOKEN'];
-        const dataget = await this.jwtService.verifyAsync(token, {
-            secret: process.env.JWT_SECRET_USER,
+        const userId = data.userId;
+        const result = await this.cartService.addIntoCart(userId, data.dataCart, data.type);
+        console.log('result', result);
+        return res.json({
+            result,
         });
-        const { email, name, userId } = dataget;
-        const productId = data.productId;
-        const result = await this.cartService.AddItemsCart(userId, productId);
-        if (result.userId) {
-            return res.status(200).json({
-                status: 200,
-                data: result,
-                message: `Product Added to Cart`,
-            });
-        }
-        else if (result.status == 403) {
-            return res.json({
-                status: 403,
-                data: '',
-                message: `${result.errmsg}`,
-            });
-        }
     }
     async updateQuantity(params, req, res) {
         const { productId, quantity } = params;
@@ -109,8 +92,6 @@ let CartController = class CartController {
             secret: process.env.JWT_SECRET_USER,
         });
         const { email, name, userId } = dataget;
-        const data = await this.cartService.quantityCart(userId, productId, quantity);
-        return res.json({ data });
     }
     async getCartData(req, res) {
         const result = await this.cartService.getCartItems(4, 'cart');
@@ -147,12 +128,8 @@ let CartController = class CartController {
         });
     }
     async addOrder(req, res, data) {
-        const { token } = req.cookies['JWT_TOKEN'];
-        const dataget = await this.jwtService.verifyAsync(token, {
-            secret: process.env.JWT_SECRET_USER,
-        });
-        const { email, name, userId } = dataget;
-        const result = await this.cartService.OrderProduct(userId);
+        console.log('data', data);
+        const result = await this.cartService.orderAdd(data.userId);
         if (result.status == 400) {
             return res.status(400).json({
                 status: 400,
@@ -174,6 +151,21 @@ let CartController = class CartController {
                 message: `Product Ordered !`,
             });
         }
+    }
+    async getRestoreCartData(req, res) {
+        const authHeader = req.headers.authorization;
+        const token = authHeader.split(' ')[1];
+        const dataget = await this.jwtService.verifyAsync(token, {
+            secret: process.env.JWT_SECRET_USER,
+        });
+        const { email, name, userId } = dataget;
+        console.log(userId);
+        const result = await this.cartService.getCartData(userId);
+        return res.status(200).json({
+            status: 200,
+            data: result,
+            message: `Cart All !`,
+        });
     }
     async getAllOrder(req, res, data) {
         const { token } = req.cookies['JWT_TOKEN'];
@@ -294,6 +286,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], CartController.prototype, "addOrder", null);
+__decorate([
+    (0, common_1.Get)('getCartData'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], CartController.prototype, "getRestoreCartData", null);
 __decorate([
     (0, common_1.Get)('getAllOrders'),
     __param(0, (0, common_1.Req)()),

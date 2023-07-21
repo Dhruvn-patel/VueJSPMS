@@ -14,7 +14,11 @@ const prisma_service_1 = require("../../prisma/prisma.service");
 const category_service_1 = require("../category/category.service");
 const category_module_1 = require("../category/category.module");
 const jwt_1 = require("@nestjs/jwt");
+const common_middleware_1 = require("../../common/common.middleware");
 let ProductsModule = class ProductsModule {
+    configure(consumer) {
+        consumer.apply(common_middleware_1.CommonMiddleware).forRoutes(products_controller_1.ProductsController);
+    }
 };
 ProductsModule = __decorate([
     (0, common_1.Module)({

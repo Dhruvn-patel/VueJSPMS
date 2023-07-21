@@ -14,7 +14,6 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductsController = void 0;
 const common_1 = require("@nestjs/common");
-const product_dto_1 = require("./dto/product.dto");
 const products_service_1 = require("./products.service");
 const swagger_1 = require("@nestjs/swagger");
 const category_service_1 = require("../category/category.service");
@@ -22,16 +21,15 @@ const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
 const filesconfig_multer_1 = require("./filesconfig.multer");
 const jwt_guard_1 = require("../../guards/jwt.guard");
+const jwt_1 = require("@nestjs/jwt");
 let ProductsController = class ProductsController {
-    constructor(productsService, categoryService) {
+    constructor(productsService, categoryService, jwtService) {
         this.productsService = productsService;
         this.categoryService = categoryService;
+        this.jwtService = jwtService;
     }
     getProducts() {
         return;
-    }
-    addProduct(product) {
-        return this.productsService.addProduct(product, product.categoryId);
     }
     async addProductwithFile(file, name, description, price, quantity, categoryIds, req, res) {
         const data = this.productsService.uploadSingleFile(file, name, description, price, quantity, categoryIds);
@@ -43,6 +41,22 @@ let ProductsController = class ProductsController {
     }
     async updateProduct(file, name, description, price, quantity, categoryIds, Id, req, res) {
         const data = this.productsService.productUpdateById(file, name, description, price, quantity, categoryIds, Id);
+        return res.status(200).json({
+            data: data,
+            errmsg: '',
+            status: 200,
+        });
+    }
+    async newProductWithImg(name, description, price, quantity, categoryIds, file, req, res) {
+        const data = this.productsService.addProductWithImg(file, name, description, price, quantity, categoryIds);
+        return res.status(200).json({
+            data: data,
+            errmsg: '',
+            status: 200,
+        });
+    }
+    async updateProductWithimg(name, description, price, quantity, categoryIds, file, Id, req, res) {
+        const data = await this.productsService.updateProductById(file, name, description, price, quantity, categoryIds, Id);
         return res.status(200).json({
             data: data,
             errmsg: '',
@@ -76,7 +90,6 @@ let ProductsController = class ProductsController {
             searchParam = params.searchValue;
         console.log('params.searchValue', searchParam, params.sortType, params.id);
         const allDataSearch = await this.productsService.allDataSearch(searchParam, params.sortType, params.id);
-        console.log('allDataSearch', allDataSearch);
         return res.status(200).json({
             data: allDataSearch,
             errmsg: '',
@@ -100,9 +113,8 @@ let ProductsController = class ProductsController {
         const data = await this.productsService.updateQuantity(id, quantity);
         return res.json({ data });
     }
-    checkProduct(product) { }
     async getUsers(req, res) {
-        const categories = await this.categoryService.getAllCategory(1, 10);
+        const categories = await this.categoryService.getAllCategory();
         return res.render('products', { categories });
     }
     async searchData(params, req, res) {
@@ -123,14 +135,6 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "getProducts", null);
-__decorate([
-    (0, swagger_1.ApiOperation)({ summary: 'insert product data with category' }),
-    (0, common_1.Post)('/addProduct'),
-    __param(0, (0, common_1.Body)(new common_1.ValidationPipe())),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [product_dto_1.productDto]),
-    __metadata("design:returntype", void 0)
-], ProductsController.prototype, "addProduct", null);
 __decorate([
     (0, common_1.Post)('/newAddProduct'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
@@ -174,6 +178,35 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, String, Number, Number, String, Number, Object, Object]),
     __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "updateProduct", null);
+__decorate([
+    (0, common_1.Post)('/newproduct'),
+    __param(0, (0, common_1.Body)('ProductName')),
+    __param(1, (0, common_1.Body)('description')),
+    __param(2, (0, common_1.Body)('price')),
+    __param(3, (0, common_1.Body)('quantity')),
+    __param(4, (0, common_1.Body)('catagory')),
+    __param(5, (0, common_1.Body)('file')),
+    __param(6, (0, common_1.Req)()),
+    __param(7, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Number, Number, String, String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], ProductsController.prototype, "newProductWithImg", null);
+__decorate([
+    (0, common_1.Put)('/updateproduct/:Id'),
+    __param(0, (0, common_1.Body)('ProductName')),
+    __param(1, (0, common_1.Body)('description')),
+    __param(2, (0, common_1.Body)('price')),
+    __param(3, (0, common_1.Body)('quantity')),
+    __param(4, (0, common_1.Body)('catagory')),
+    __param(5, (0, common_1.Body)('file')),
+    __param(6, (0, common_1.Param)('Id')),
+    __param(7, (0, common_1.Req)()),
+    __param(8, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Number, Number, String, String, Number, Object, Object]),
+    __metadata("design:returntype", Promise)
+], ProductsController.prototype, "updateProductWithimg", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'delete product data ' }),
     (0, common_1.Delete)('/deleteProduct/:id'),
@@ -228,13 +261,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "updateQuantity", null);
 __decorate([
-    (0, common_1.Post)('checkproduct'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], ProductsController.prototype, "checkProduct", null);
-__decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Response)()),
@@ -255,7 +281,8 @@ ProductsController = __decorate([
     (0, swagger_1.ApiTags)('Product Module'),
     (0, common_1.Controller)('products'),
     __metadata("design:paramtypes", [products_service_1.ProductsService,
-        category_service_1.CategoryService])
+        category_service_1.CategoryService,
+        jwt_1.JwtService])
 ], ProductsController);
 exports.ProductsController = ProductsController;
 //# sourceMappingURL=products.controller.js.map

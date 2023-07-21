@@ -52,17 +52,13 @@ let CategoryService = class CategoryService {
         });
         return data;
     }
-    async getAllCategory(page, pageSize) {
+    async getAllCategory() {
         const totaldata = await this.prismService.categories.count({});
-        const skip = (page - 1) * pageSize;
-        const take = pageSize;
         const data = await this.prismService.categories.findMany({
             select: {
                 id: true,
                 name: true,
             },
-            skip,
-            take,
         });
         return {
             data,
@@ -186,7 +182,6 @@ let CategoryService = class CategoryService {
         const { column, dir } = order[0];
         let columnName = req.query.columns[column].data;
         query.orderBy.push({ [`${columnName}`]: dir });
-        console.log('columnName', columnName);
         let data;
         if (isNaN(search.value)) {
             data = {

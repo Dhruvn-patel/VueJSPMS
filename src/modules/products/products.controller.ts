@@ -32,14 +32,18 @@ import {
   imageFileFilter,
 } from './filesconfig.multer';
 import { AuthGuard } from '../../guards/jwt.guard';
+import { file } from 'googleapis/build/src/apis/file';
+import { JwtService } from '@nestjs/jwt';
 @ApiTags('Product Module')
 @Controller('products')
 export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
     private readonly categoryService: CategoryService,
+    private readonly jwtService: JwtService,
   ) {}
 
+  /* render products */
   @UseGuards(AuthGuard)
   @Get()
   @Render('products')
@@ -47,12 +51,13 @@ export class ProductsController {
     return;
   }
 
-  @ApiOperation({ summary: 'insert product data with category' })
-  @Post('/addProduct')
-  addProduct(@Body(new ValidationPipe()) product: productDto) {
-    return this.productsService.addProduct(product, product.categoryId);
-  }
+  // @ApiOperation({ summary: 'insert product data with category' })
+  // @Post('/addProduct')
+  // addProduct(@Body(new ValidationPipe()) product: productDto) {
+  //   return this.productsService.addProduct(product, product.categoryId);
+  // }
 
+  /* add product with image  */
   @Post('/newAddProduct')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -73,6 +78,7 @@ export class ProductsController {
     @Req() req,
     @Res() res,
   ) {
+  
     const data = this.productsService.uploadSingleFile(
       file,
       name,
@@ -80,6 +86,7 @@ export class ProductsController {
       price,
       quantity,
       categoryIds,
+    
     );
     return res.status(200).json({
       data: data,
@@ -88,6 +95,7 @@ export class ProductsController {
     });
   }
 
+  /* update product with image  */
   @Post('/updateProduct')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -125,6 +133,69 @@ export class ProductsController {
     });
   }
 
+  /* base64 img  addproduct */
+  @Post('/newproduct')
+  async newProductWithImg(
+    @Body('ProductName') name: string,
+    @Body('description') description: string,
+    @Body('price') price: number,
+    @Body('quantity') quantity: number,
+    @Body('catagory') categoryIds: string,
+    @Body('file') file: string,
+    @Req() req,
+    @Res() res,
+  ) {
+  
+    const data = this.productsService.addProductWithImg(
+      file,
+      name,
+      description,
+      price,
+      quantity,
+      categoryIds,
+ 
+    );
+    return res.status(200).json({
+      data: data,
+      errmsg: '',
+      status: 200,
+    });
+  }
+
+  /* base64 img updateproduct */
+
+  @Put('/updateproduct/:Id')
+  async updateProductWithimg(
+    @Body('ProductName') name: string,
+    @Body('description') description: string,
+    @Body('price') price: number,
+    @Body('quantity') quantity: number,
+    @Body('catagory') categoryIds: string,
+    @Body('file') file: string,
+    @Param('Id') Id: number,
+    @Req() req,
+    @Res() res,
+  ) {
+  
+    const data = await this.productsService.updateProductById(
+      file,
+      name,
+      description,
+      price,
+      quantity,
+      categoryIds,
+      Id,
+
+    );
+
+    return res.status(200).json({
+      data: data,
+      errmsg: '',
+      status: 200,
+    });
+  }
+
+  /* delete product */
   @ApiOperation({ summary: 'delete product data ' })
   @Delete('/deleteProduct/:id')
   async deleteProduct(
@@ -132,6 +203,8 @@ export class ProductsController {
     @Req() req,
     @Res() res,
   ) {
+  
+
     const data = await this.productsService.deleteProduct(id);
     return res.status(200).json({
       data: data,
@@ -140,6 +213,7 @@ export class ProductsController {
     });
   }
 
+  /* getAllProducts */
   @Get('allProducts')
   async findAllProducts(@Query() params: any, @Req() req, @Res() res) {
     const { page, pageSize } = params;
@@ -156,6 +230,8 @@ export class ProductsController {
     });
   }
 
+  /* main filter with products
+   */
   @Get('listProduct')
   async AllProducts(@Req() req, @Res() res, @Query() params) {
     const { productsWithCategory } = await this.productsService.AllProducts(
@@ -173,7 +249,6 @@ export class ProductsController {
       params.sortType,
       params.id,
     );
-    console.log('allDataSearch', allDataSearch);
 
     return res.status(200).json({
       data: allDataSearch,
@@ -182,6 +257,7 @@ export class ProductsController {
     });
   }
 
+  /* categoryWise product */
   @Get('categoryWise/:id')
   async getProductByCategoryId(@Param() params: any, @Req() req, @Res() res) {
     const result = await this.productsService.categorywiseProduct(
@@ -194,6 +270,7 @@ export class ProductsController {
     });
   }
 
+  /* get single product by Id */
   @Get('getProductById/:id')
   async getProduct(@Param() params: any) {
     const data = await this.productsService.getAllProductsWithCategoryById(
@@ -202,6 +279,8 @@ export class ProductsController {
 
     return data;
   }
+
+  /* update Quantity */
   @Get('/updateQuantity')
   async updateQuantity(@Query() params: any, @Req() req, @Res() res) {
     const { id, quantity } = params;
@@ -209,16 +288,14 @@ export class ProductsController {
     return res.json({ data });
   }
 
-  @Post('checkproduct')
-  checkProduct(@Body() product) {}
-
+  /* GetAllCategories */
   @Get()
   async getUsers(@Request() req, @Response() res) {
-    const categories = await this.categoryService.getAllCategory(1, 10);
-
+    const categories = await this.categoryService.getAllCategory();
     return res.render('products', { categories });
   }
 
+  /* search product */
   @Get('search')
   async searchData(@Query() params: any, @Req() req, @Res() res) {
     const { products, totalData } = await this.productsService.searchProducts(
@@ -226,7 +303,6 @@ export class ProductsController {
       Number(params.page),
       Number(params.pageSize),
     );
-
     return res.status(200).json({
       data: products,
       errmsg: '',

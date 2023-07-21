@@ -7,7 +7,7 @@ export declare class UserController {
     constructor(userService: UserService, jwtService: JwtService);
     create(createUserDto: CreateUserDto, req: any, res: any): Promise<any>;
     AllUsers(): void;
-    findAll(params: any, req: any, res: any): Promise<any>;
+    findAll(req: any, res: any): Promise<any>;
     searchUsers(params: any, req: any, res: any): Promise<any>;
     update(id: number, updatedata: any, req: any, res: any): Promise<any>;
     remove(id: number, req: any, res: any): Promise<any>;

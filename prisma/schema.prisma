@@ -53,17 +53,15 @@ model Product {
   id              Int               @id @default(autoincrement())
   ProductName     String
   description     String?
-  image           String            @default("")
+  image           String            @db.LongText
   price           Int               @default(0)
   quantity        Int
   createdAt       DateTime?         @default(now())
   updatedAt       DateTime?         @default(now())
   deletedAt       DateTime?
   ProductCategory ProductCategory[]
-  cart            Cart[]
-
-  Order        Order[]
-  OrderProduct OrderProduct[]
+  Order           Order[]
+  OrderProduct    OrderProduct[]
 }
 
 model Categories {
@@ -95,11 +93,9 @@ model Cart {
   total     Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  Product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  deleted   Boolean  @default(false)
 
-  @@unique([userId, productId])
+  deleted Boolean @default(false)
+  User    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Order {

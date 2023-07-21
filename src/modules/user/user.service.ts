@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -10,11 +10,14 @@ export class UserService {
   async create(createUserDto: CreateUserDto, rolesId: number) {
     try {
       const hashpassword = await bcrypt.hash(createUserDto.password, 10);
-      // const emailExists = await prisma.user.findUnique({
-      //   where: { email: createUserDto.email },
-      // });
-      // console.log('createUserDto.rolesId', createUserDto.rolesId);
-
+      const emailExists = await prisma.user.findUnique({
+        where: { email: createUserDto.email },
+      });
+      console.log('createUserDto.rolesId', createUserDto.rolesId);
+      if (emailExists)
+        return {
+          errorCode: 409,
+        };
       const data = await prisma.user.create({
         data: {
           email: createUserDto.email,
@@ -29,11 +32,11 @@ export class UserService {
     }
   }
 
-  async findAll(page: number, pageSize: number) {
+  async findAll() {
     try {
       const totaldata = await prisma.user.count({});
-      const skip = (page - 1) * pageSize;
-      const take = pageSize;
+      // const skip = (page - 1) * pageSize;
+      // const take = pageSize;
       const data = await prisma.user.findMany({
         select: {
           id: true,
@@ -42,8 +45,7 @@ export class UserService {
           rolesId: true,
           googleId: false,
         },
-        skip,
-        take,
+
       });
       return {
         data,

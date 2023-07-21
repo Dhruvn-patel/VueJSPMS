@@ -42,6 +42,10 @@ export class SignupController {
     }
     return;
   }
+
+  /*  
+/signup (post)
+*/
   @Post()
   async signUp(
     @Body(new ValidationPipe()) authsignup: AuthSignUpDto,
@@ -56,6 +60,7 @@ export class SignupController {
       console.log('resdata', resdata);
 
       if (resdata.errorCode == 409) {
+        console.log('402');
         return res.status(409).json({
           errmsg: 'Email is already registered',
           data: null,
@@ -63,7 +68,7 @@ export class SignupController {
         });
       } else if (resdata.errorCode === 200) {
         return res.status(200).json({
-          errmsg: '',
+          errmsg: 'Successfully signup',
           data: resdata,
           status: 200,
         });

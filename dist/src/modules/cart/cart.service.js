@@ -49,18 +49,48 @@ let CartService = class CartService {
             return error;
         }
     }
-    async quantityCart(UserID, productId, quantity) {
-        return await prisma.cart.update({
+    async addIntoCart(userId, data, type) {
+        let cartData = [];
+        if (type) {
+            data.map((cart) => {
+                cartData.push({
+                    userId: userId,
+                    Quantity: cart.quantity,
+                    productId: Number(cart.id),
+                    total: Number(cart.price * cart.quantity),
+                    deleted: true,
+                });
+            });
+        }
+        else {
+            data.map((cart) => {
+                cartData.push({
+                    userId: userId,
+                    Quantity: cart.quantity,
+                    productId: Number(cart.id),
+                    total: Number(cart.price * cart.quantity),
+                });
+            });
+        }
+        try {
+            const CreateCart = await prisma.cart.createMany({
+                data: cartData,
+            });
+            return CreateCart;
+        }
+        catch (error) {
+            return error;
+        }
+    }
+    async getCartData(userId) {
+        const findProductFromCart = await prisma.cart.findMany({
             where: {
-                userId_productId: {
-                    userId: Number(UserID),
-                    productId: Number(productId),
-                },
-            },
-            data: {
-                Quantity: Number(quantity),
+                userId: Number(userId),
+                deleted: true,
             },
         });
+        const cartRestoreArr = [];
+        console.log(findProductFromCart, findProductFromCart);
     }
     async getCartItems(UserID, type) {
         try {
@@ -126,17 +156,6 @@ let CartService = class CartService {
             return new common_1.ForbiddenException();
         }
     }
-    async getQuantityById(id, UserID) {
-        const data = await prisma.cart.findUnique({
-            where: {
-                userId_productId: {
-                    userId: Number(UserID),
-                    productId: Number(id),
-                },
-            },
-        });
-        return data;
-    }
     async deleteSoftValues(UserID) {
         const data = await prisma.cart.updateMany({
             where: {
@@ -168,7 +187,6 @@ let CartService = class CartService {
                 totalAmount += Number(product.total) * Number(product.Quantity);
                 totalQuantity += Number(product.Quantity);
             });
-            await this.deleteCartData(UserID);
             const placeOrder = await prisma.order.create({
                 data: {
                     totalPrice: Number(totalAmount),
@@ -185,6 +203,44 @@ let CartService = class CartService {
         catch (error) {
             console.log(error);
             return new common_1.ForbiddenException();
+        }
+    }
+    async orderAdd(userId) {
+        try {
+            const findProductFromCart = await prisma.cart.findMany({
+                where: {
+                    userId: Number(userId),
+                    deleted: true,
+                },
+            });
+            const objectData = findProductFromCart;
+            var totalAmount = 0;
+            var totalQuantity = 0;
+            const ProductArr = [];
+            objectData.map((product) => {
+                ProductArr.push({
+                    productId: product.productId,
+                    userId: Number(userId),
+                    quantity: Number(product.Quantity),
+                });
+                totalAmount += Number(product.total) * Number(product.Quantity);
+                totalQuantity += Number(product.Quantity);
+            });
+            const placeOrder = await prisma.order.create({
+                data: {
+                    totalPrice: Number(totalAmount),
+                    userId: Number(userId),
+                    OrderProduct: {
+                        createMany: {
+                            data: ProductArr,
+                        },
+                    },
+                },
+            });
+            return placeOrder;
+        }
+        catch (error) {
+            console.log(error);
         }
     }
     async deleteCartData(UserID) {

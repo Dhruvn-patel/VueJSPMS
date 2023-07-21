@@ -101,35 +101,43 @@ export class CartController {
     });
     const { email, name, userId } = dataget;
     const { id } = params;
-    const data = await this.cartService.getQuantityById(id, userId);
-    return res.json({ data });
+    // const data = await this.cartService.getQuantityById(id, userId);
+    // return res.json({ data });
   }
 
   @Post('addIntoCart')
   async getAddInCart(@Req() req, @Res() res, @Body() data): Promise<any> {
-    const { token } = req.cookies['JWT_TOKEN'];
-    const dataget = await this.jwtService.verifyAsync(token, {
-      secret: process.env.JWT_SECRET_USER,
+    // const { token } = req.cookies['JWT_TOKEN'];
+    // const dataget = await this.jwtService.verifyAsync(token, {
+    //   secret: process.env.JWT_SECRET_USER,
+    // });
+    // const { email, name, userId } = dataget;
+    // const productId = data.productId;
+    // const result = await this.cartService.AddItemsCart(userId, productId);
+    // if (result.userId) {
+    //   return res.status(200).json({
+    //     status: 200,
+    //     data: result,
+    //     message: `Product Added to Cart`,
+    //   });
+    // } else if (result.status == 403) {
+    //   return res.json({
+    //     status: 403,
+    //     data: '',
+    //     message: `${result.errmsg}`,
+    //   });
+    // }
+    const userId = data.userId;
+    const result = await this.cartService.addIntoCart(
+      userId,
+      data.dataCart,
+      data.type,
+    );
+    console.log('result', result);
+    return res.json({
+      result,
     });
-    const { email, name, userId } = dataget;
-    const productId = data.productId;
-    const result = await this.cartService.AddItemsCart(userId, productId);
-
-    if (result.userId) {
-      return res.status(200).json({
-        status: 200,
-        data: result,
-        message: `Product Added to Cart`,
-      });
-    } else if (result.status == 403) {
-      return res.json({
-        status: 403,
-        data: '',
-        message: `${result.errmsg}`,
-      });
-    }
   }
-
   @Get('/updateQuantity')
   async updateQuantity(@Query() params: any, @Req() req, @Res() res) {
     const { productId, quantity } = params;
@@ -138,12 +146,12 @@ export class CartController {
       secret: process.env.JWT_SECRET_USER,
     });
     const { email, name, userId } = dataget;
-    const data = await this.cartService.quantityCart(
-      userId,
-      productId,
-      quantity,
-    );
-    return res.json({ data });
+    // const data = await this.cartService.quantityCart(
+    //   userId,
+    //   productId,
+    //   quantity,
+    // );
+    // return res.json({ data });
   }
 
   @Get('getData')
@@ -184,9 +192,7 @@ export class CartController {
       secret: process.env.JWT_SECRET_USER,
     });
     const { email, name, userId } = dataget;
-
     const result = await this.cartService.DeleteItemsInCart(userId, params.id);
-
     return res.status(200).json({
       status: 200,
       data: result,
@@ -196,12 +202,16 @@ export class CartController {
 
   @Post('OrderAdd')
   async addOrder(@Req() req, @Res() res, @Body() data): Promise<any> {
-    const { token } = req.cookies['JWT_TOKEN'];
-    const dataget = await this.jwtService.verifyAsync(token, {
-      secret: process.env.JWT_SECRET_USER,
-    });
-    const { email, name, userId } = dataget;
-    const result = await this.cartService.OrderProduct(userId);
+    // const { token } = req.cookies['JWT_TOKEN'];
+    // const dataget = await this.jwtService.verifyAsync(token, {
+    //   secret: process.env.JWT_SECRET_USER,
+    // });
+    // const { email, name, userId } = dataget;
+
+    // const result = await this.cartService.OrderProduct(userId);
+    console.log('data', data);
+
+    const result = await this.cartService.orderAdd(data.userId);
 
     if (result.status == 400) {
       return res.status(400).json({
@@ -222,6 +232,23 @@ export class CartController {
         message: `Product Ordered !`,
       });
     }
+  }
+
+  @Get('getCartData')
+  async getRestoreCartData(@Req() req, @Res() res) {
+    const authHeader = req.headers.authorization;
+    const token = authHeader.split(' ')[1];
+    const dataget = await this.jwtService.verifyAsync(token, {
+      secret: process.env.JWT_SECRET_USER,
+    });
+    const { email, name, userId } = dataget;
+    console.log(userId);
+    const result = await this.cartService.getCartData(userId);
+    return res.status(200).json({
+      status: 200,
+      data: result,
+      message: `Cart All !`,
+    });
   }
 
   @Get('getAllOrders')

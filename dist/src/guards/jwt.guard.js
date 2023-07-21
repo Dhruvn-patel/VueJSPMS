@@ -20,7 +20,7 @@ let AuthGuard = class AuthGuard {
         const request = context.switchToHttp().getRequest();
         if (request.cookies['JWT_TOKEN'] != null) {
             const token = request.cookies['JWT_TOKEN'];
-            console.log('token', token);
+            console.log('token=================>', token);
             if (token === undefined) {
                 request.res.redirect('/signin');
                 return false;

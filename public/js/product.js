@@ -214,33 +214,58 @@ async function createData() {
     const selectedValues = Array.from(categoryselect.querySelectorAll("option"))
         .filter(option => option.selected)
         .map(option => option.value);
-    const categorystring = selectedValues.join(", ");
-    const formData = new FormData();
-    formData.append('file', formFile.files[0]);
-    formData.append('ProductName', categoryname.value.trim());
-    formData.append('description', prouductdesc.value.trim());
-    formData.append('price', price.value);
-    formData.append('quantity', quantity.value);
-    formData.append('catagory', categorystring);
+    let categorystring = selectedValues.join(",");
+    console.log("categorystring", categorystring);
+    let reader = new FileReader();
+    let file = formFile.files[0];
+    reader.readAsDataURL(file);
+    reader.onloadend = async (base64) => {
+
+        const base64String = reader.result;
+        const img = base64.currentTarget.result;
+        // const formData = new FormData();
+        // formData.append('file', img);
+        // formData.append('ProductName', categoryname.value.trim());
+        // formData.append('description', prouductdesc.value.trim());
+        // formData.append('price', price.value);
+        // formData.append('quantity', quantity.value);
+        // formData.append('catagory', categorystring);
 
 
 
-    const responsedata = await fetch('/products/newAddProduct', {
-        method: 'POST',
-        headers: {
-        },
-        body: formData
-    })
-    const results = await responsedata.json();
+        const responsedata = await fetch('/products/newproduct', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                file: img,
+                ProductName: categoryname.value.trim(),
+                description: prouductdesc.value.trim(),
+                price: price.value,
+                quantity: quantity.value,
+                catagory: categorystring
+            })
+        })
 
-    if (results.status == 200) {
-        alert('Product added successfully');
-        // userData('categoryselect')
+        const results = await responsedata.json();
+        console.log("results+++++++", results);
+        if (results.status == 200) {
+            alert('Product added successfully');
+        }
 
+        categoryname.value = ''
+        disableCreateModal()
     }
 
-    categoryname.value = ''
-    disableCreateModal()
+    // const responsedata = await fetch('/products/newAddProduct', {
+    //     method: 'POST',
+    //     headers: {
+    //     },
+    //     body: formData
+    // })
+
+
 }
 function disableBtn() {
     createbtn.disabled = true;
@@ -258,7 +283,7 @@ let validateName_flag = 1, validateMail_flag = 1;
 
 
 async function deleteData(ele) {
-  
+
     const submitForm = await fetch(`/products/deleteProduct/${ele.id}`, {
         method: 'DELETE',
         headers: {
@@ -297,7 +322,7 @@ async function updateSubmit() {
         .filter(option => option.selected)
         .map(option => option.value);
     const categorystring = selectedValues.join(", ");
-  
+
 
     const formData = new FormData();
     formData.append('file', updateformFile.files[0]);

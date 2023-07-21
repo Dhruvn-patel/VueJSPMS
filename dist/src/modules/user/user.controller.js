@@ -25,6 +25,13 @@ let UserController = class UserController {
     }
     async create(createUserDto, req, res) {
         const data = await this.userService.create(createUserDto, createUserDto.rolesId);
+        if (data.errorCode == 409) {
+            return res.status(409).json({
+                errmsg: 'Email is already registered',
+                data: null,
+                status: 409,
+            });
+        }
         return res.status(200).json({
             data: data,
             errmsg: '',
@@ -34,9 +41,8 @@ let UserController = class UserController {
     AllUsers() {
         return;
     }
-    async findAll(params, req, res) {
-        const { page, pageSize } = params;
-        const { data, totaldata } = await this.userService.findAll(Number(page), Number(pageSize));
+    async findAll(req, res) {
+        const { data, totaldata } = await this.userService.findAll();
         return res.status(200).json({
             data: data,
             totaldata: totaldata,
@@ -55,24 +61,25 @@ let UserController = class UserController {
         });
     }
     async update(id, updatedata, req, res) {
-        const { token } = req.cookies['JWT_TOKEN'];
+        const token = req.headers.authorization.split(' ')[1];
         const dataget = await this.jwtService.verifyAsync(token, {
             secret: process.env.JWT_SECRET_USER,
         });
-        const { email, name, userId } = dataget;
-        console.log('updateemail', email);
+        const { email } = dataget;
+        console.log(email);
         const data = await this.userService.update(id, updatedata);
         console.log('data email', data.email, email);
-        if (data.email == email) {
-            req.session.destroy((err) => {
-                console.log('session is destoryed');
-            });
-            res.clearCookie('JWT_TOKEN');
-            return res.json({
-                errmsg: '',
-                status: 203,
-                data: null,
-            });
+        if (data.email === email) {
+            try {
+                res.status(403).json({
+                    errmsg: 'admin user updated !',
+                    data: null,
+                    status: 403,
+                });
+            }
+            catch (error) {
+                return error;
+            }
         }
         else if (data.statusCode === 200) {
             return res.json({
@@ -85,11 +92,16 @@ let UserController = class UserController {
     async remove(id, req, res) {
         const data = await this.userService.remove(id);
         if (data.statusCode === 403) {
-            return res.json({
-                errmsg: 'admin account only one user',
-                status: 403,
-                data: null,
-            });
+            try {
+                return res.status(403).json({
+                    errmsg: 'admin account currently logined!',
+                    status: 403,
+                    data: null,
+                });
+            }
+            catch (error) {
+                return error;
+            }
         }
         else if (data.statusCode === 200) {
             return res.json({
@@ -155,11 +167,10 @@ __decorate([
 ], UserController.prototype, "AllUsers", null);
 __decorate([
     (0, common_1.Get)('getUsers'),
-    __param(0, (0, common_1.Query)()),
-    __param(1, (0, common_1.Req)()),
-    __param(2, (0, common_1.Res)()),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "findAll", null);
 __decorate([

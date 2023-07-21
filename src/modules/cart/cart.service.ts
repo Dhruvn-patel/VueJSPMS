@@ -51,19 +51,81 @@ export class CartService {
       return error;
     }
   }
-  async quantityCart(UserID: number, productId: number, quantity: number) {
-    return await prisma.cart.update({
+
+  /* vueJs Api */
+  async addIntoCart(userId: number, data: any, type: boolean) {
+    // const CreateCart = await prisma.cart.create({
+    //   data: {
+    //     userId: userId,
+    //     Quantity: Number(Quantity),
+    //     productId: Number(productId),
+    //     total: findProduct.price,
+    //   },
+    // });
+    // return CreateCart;
+
+    let cartData = [];
+    if (type) {
+      data.map((cart: any) => {
+        cartData.push({
+          userId: userId,
+          Quantity: cart.quantity,
+          productId: Number(cart.id),
+          total: Number(cart.price * cart.quantity),
+          deleted: true,
+        });
+      });
+    } else {
+      data.map((cart: any) => {
+        cartData.push({
+          userId: userId,
+          Quantity: cart.quantity,
+          productId: Number(cart.id),
+          total: Number(cart.price * cart.quantity),
+        });
+      });
+    }
+    try {
+      const CreateCart = await prisma.cart.createMany({
+        data: cartData,
+      });
+      return CreateCart;
+    } catch (error) {
+      return error;
+    }
+  }
+  /* cart data restore */
+  async getCartData(userId: number) {
+    const findProductFromCart = await prisma.cart.findMany({
       where: {
-        userId_productId: {
-          userId: Number(UserID),
-          productId: Number(productId),
-        },
-      },
-      data: {
-        Quantity: Number(quantity),
+        userId: Number(userId),
+        deleted: true,
       },
     });
+
+    const cartRestoreArr = [];
+    // findProductFromCart.map((user) => {
+    //   if (user.userId === userId) {
+
+
+    //   }
+    // });
+
+    console.log(findProductFromCart, findProductFromCart);
   }
+  // async quantityCart(UserID: number, productId: number, quantity: number) {
+  //   return await prisma.cart.update({
+  //     where: {
+  //       userId_productId: {
+  //         userId: Number(UserID),
+  //         productId: Number(productId),
+  //       },
+  //     },
+  //     data: {
+  //       Quantity: Number(quantity),
+  //     },
+  //   });
+  // }
   async getCartItems(UserID: number, type: string): Promise<any> {
     try {
       let getUserCartItems: any;
@@ -131,17 +193,17 @@ export class CartService {
     }
   }
 
-  async getQuantityById(id: number, UserID: number): Promise<any> {
-    const data = await prisma.cart.findUnique({
-      where: {
-        userId_productId: {
-          userId: Number(UserID),
-          productId: Number(id),
-        },
-      },
-    });
-    return data;
-  }
+  // async getQuantityById(id: number, UserID: number): Promise<any> {
+  //   const data = await prisma.cart.findUnique({
+  //     where: {
+  //       userId_productId: {
+  //         userId: Number(UserID),
+  //         productId: Number(id),
+  //       },
+  //     },
+  //   });
+  //   return data;
+  // }
 
   async deleteSoftValues(UserID: Number) {
     const data = await prisma.cart.updateMany({
@@ -166,7 +228,6 @@ export class CartService {
       var totalAmount: number = 0;
       var totalQuantity: number = 0;
       const ProductArr = [];
-
       objectData.map((product: any) => {
         ProductArr.push({
           productId: product.productId,
@@ -177,7 +238,7 @@ export class CartService {
         totalQuantity += Number(product.Quantity);
       });
 
-      await this.deleteCartData(UserID);
+      // await this.deleteCartData(UserID);
 
       const placeOrder = await prisma.order.create({
         data: {
@@ -194,6 +255,45 @@ export class CartService {
     } catch (error) {
       console.log(error);
       return new ForbiddenException();
+    }
+  }
+  async orderAdd(userId: number): Promise<any> {
+    try {
+      const findProductFromCart = await prisma.cart.findMany({
+        where: {
+          userId: Number(userId),
+          deleted: true,
+        },
+      });
+      const objectData: any = findProductFromCart;
+      var totalAmount: number = 0;
+      var totalQuantity: number = 0;
+      const ProductArr = [];
+      objectData.map((product: any) => {
+        ProductArr.push({
+          productId: product.productId,
+          userId: Number(userId),
+          quantity: Number(product.Quantity),
+        });
+        totalAmount += Number(product.total) * Number(product.Quantity);
+        totalQuantity += Number(product.Quantity);
+      });
+
+      // await this.deleteCartData(UserID);
+      const placeOrder = await prisma.order.create({
+        data: {
+          totalPrice: Number(totalAmount),
+          userId: Number(userId),
+          OrderProduct: {
+            createMany: {
+              data: ProductArr,
+            },
+          },
+        },
+      });
+      return placeOrder;
+    } catch (error) {
+      console.log(error);
     }
   }
 

@@ -39,7 +39,6 @@ export class SigninService {
           email: email,
         },
       });
-      console.log(user.id);
 
       /* check user exists or not */
       if (user == null) {
@@ -60,7 +59,7 @@ export class SigninService {
           roles: user.rolesId,
           userId: Number(user.id),
         });
-        return { token, roles: user.rolesId };
+        return { token: token, roles: user.rolesId };
       }
     } catch (error) {
       console.log(error.message);
@@ -83,11 +82,11 @@ export class SigninService {
     return token;
   }
 
+  /* google token  */
   async googleLogin(@Req() req, @Res() res) {
     if (!req.user.email) {
       return 'No user from google';
     }
-
     const datainserted = await prisma.user.upsert({
       where: {
         email: req.user.email,
@@ -112,7 +111,6 @@ export class SigninService {
       token: tokendata,
     };
     res.cookie('JWT_TOKEN', token, { httpOnly: true });
-    req.session.roles = 2;
     return {
       message: 'User Info from Google',
       user: req.user,

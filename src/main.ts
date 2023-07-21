@@ -21,7 +21,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   app.useStaticAssets(join(__dirname, '../../', 'public'));
   app.setBaseViewsDir(join(__dirname, '../../', 'views'));
-  app.enableCors();
+  app.enableCors({ credentials: true, origin: true });
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
@@ -32,7 +32,7 @@ async function bootstrap() {
       },
     }),
   );
-
+  app.useBodyParser('json', { limit: '200mb' });
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
   app.setViewEngine('ejs');

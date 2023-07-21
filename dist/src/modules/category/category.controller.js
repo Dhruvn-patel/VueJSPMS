@@ -24,9 +24,8 @@ let CategoryController = class CategoryController {
     cartegoryData() {
         return;
     }
-    async findAllCategory(params, req, res) {
-        const { page, pageSize } = params;
-        const { data, totaldata } = await this.categoryService.getAllCategory(Number(page), Number(pageSize));
+    async findAllCategory(req, res) {
+        const { data, totaldata } = await this.categoryService.getAllCategory();
         return res.status(200).json({
             data: data,
             totaldata: totaldata,
@@ -91,7 +90,6 @@ let CategoryController = class CategoryController {
     }
     async fetchCategory(req, res) {
         const categorydata = await this.categoryService.categoryListing(req);
-        console.log(categorydata);
         res.json({
             data: categorydata.user,
             recordsTotal: categorydata.user.length,
@@ -109,11 +107,10 @@ __decorate([
 ], CategoryController.prototype, "cartegoryData", null);
 __decorate([
     (0, common_1.Get)('allCategories'),
-    __param(0, (0, common_1.Query)()),
-    __param(1, (0, common_1.Req)()),
-    __param(2, (0, common_1.Res)()),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], CategoryController.prototype, "findAllCategory", null);
 __decorate([

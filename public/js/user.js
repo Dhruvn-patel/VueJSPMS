@@ -394,3 +394,60 @@ $(document).ready(function () {
 
     });
 })
+
+
+
+
+/* 
+
+<body>
+  <div id="app" class="container">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="user in users" :key="user.id">
+          <td>{{ user.id }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data() {
+        return {
+          users: []
+        }
+      },
+      mounted() {
+        this.fetchUsers();
+      },
+      methods: {
+        fetchUsers() {
+          axios.get('https://api.example.com/users')
+            .then(response => {
+              this.users = response.data;
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        }
+      }
+    });
+  </script>
+</body>
+
+
+*/
+

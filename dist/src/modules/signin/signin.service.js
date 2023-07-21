@@ -33,7 +33,6 @@ let SigninService = class SigninService {
                     email: email,
                 },
             });
-            console.log(user.id);
             if (user == null) {
                 return new common_1.UnauthorizedException();
             }
@@ -50,7 +49,7 @@ let SigninService = class SigninService {
                     roles: user.rolesId,
                     userId: Number(user.id),
                 });
-                return { token, roles: user.rolesId };
+                return { token: token, roles: user.rolesId };
             }
         }
         catch (error) {
@@ -92,7 +91,6 @@ let SigninService = class SigninService {
             token: tokendata,
         };
         res.cookie('JWT_TOKEN', token, { httpOnly: true });
-        req.session.roles = 2;
         return {
             message: 'User Info from Google',
             user: req.user,

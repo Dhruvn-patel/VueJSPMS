@@ -17,12 +17,6 @@ let RedirectRouteMiddleware = class RedirectRouteMiddleware {
         this.jwtService = jwtService;
     }
     async use(req, res, next) {
-        const { token } = req.cookies['JWT_TOKEN'];
-        const dataget = await this.jwtService.verifyAsync(token, {
-            secret: process.env.JWT_SECRET_USER,
-        });
-        const { email, name, userId, roles } = dataget;
-        console.log(email, name, userId, roles);
         next();
     }
 };

@@ -113,7 +113,7 @@
     </div>
     <script>
       async function submitData(element) {
-        console.log(element.name.value);
+
         const error = document.getElementById('emailError');
         const submitdata = await fetch(`/signup`, {
           method: 'POST',

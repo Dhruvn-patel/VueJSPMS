@@ -44,27 +44,38 @@ let SigninController = class SigninController {
     async signIn(authsignin, req, res, session) {
         try {
             const responseToken = await this.signinService.signIn(authsignin, req, res);
-            if (responseToken.status === 401) {
+            console.log('response service', responseToken);
+            if (responseToken.status == 401) {
                 console.log('401');
-                res.status(401).json({
-                    errmsg: 'email is not registered',
-                    data: null,
-                    status: 401,
-                });
+                try {
+                    res.status(401).json({
+                        errmsg: 'email is not registered',
+                        data: null,
+                        status: 401,
+                    });
+                }
+                catch (error) {
+                    return error;
+                }
             }
             else if (responseToken.status == 400) {
                 console.log('400');
-                res.status(400).json({
-                    errmsg: 'password is not correct',
-                    data: null,
-                    status: 400,
-                });
+                try {
+                    res.status(400).json({
+                        errmsg: 'password is not correct',
+                        data: null,
+                        status: 400,
+                    });
+                }
+                catch (error) {
+                    return error;
+                }
             }
             else {
                 res.cookie('JWT_TOKEN', responseToken, { httpOnly: true });
                 session.roles = responseToken.roles;
                 res.status(200).json({
-                    errmsg: '',
+                    errmsg: 'Successfully login',
                     data: responseToken.token,
                     roles: responseToken.roles,
                     status: 200,

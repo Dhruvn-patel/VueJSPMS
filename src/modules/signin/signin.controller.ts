@@ -58,26 +58,35 @@ export class SigninController {
         req,
         res,
       );
+      console.log('response service', responseToken);
 
-      if (responseToken.status === 401) {
+      if (responseToken.status == 401) {
         console.log('401');
-        res.status(401).json({
-          errmsg: 'email is not registered',
-          data: null,
-          status: 401,
-        });
+        try {
+          res.status(401).json({
+            errmsg: 'email is not registered',
+            data: null,
+            status: 401,
+          });
+        } catch (error) {
+          return error;
+        }
       } else if (responseToken.status == 400) {
         console.log('400');
-        res.status(400).json({
-          errmsg: 'password is not correct',
-          data: null,
-          status: 400,
-        });
+        try {
+          res.status(400).json({
+            errmsg: 'password is not correct',
+            data: null,
+            status: 400,
+          });
+        } catch (error) {
+          return error;
+        }
       } else {
         res.cookie('JWT_TOKEN', responseToken, { httpOnly: true });
         session.roles = responseToken.roles;
-        res.status(200).json({
-          errmsg: '',
+        res.status(200).json({    
+          errmsg: 'Successfully login',
           data: responseToken.token,
           roles: responseToken.roles,
           status: 200,
@@ -100,7 +109,6 @@ export class SigninController {
   ): Promise<any> {
     const googleres = await this.signinService.googleLogin(req, res);
     console.log(googleres);
-
     return res.redirect('/home');
   }
 }

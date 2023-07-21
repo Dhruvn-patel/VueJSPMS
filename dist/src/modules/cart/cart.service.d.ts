@@ -2,12 +2,13 @@ import { ForbiddenException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 export declare class CartService {
     AddItemsCart(userId: number, productId: number): Promise<any>;
-    quantityCart(UserID: number, productId: number, quantity: number): Promise<import(".prisma/client").Cart>;
+    addIntoCart(userId: number, data: any, type: boolean): Promise<any>;
+    getCartData(userId: number): Promise<void>;
     getCartItems(UserID: number, type: string): Promise<any>;
     DeleteItemsInCart(UserID: number, ProductId: number): Promise<any>;
-    getQuantityById(id: number, UserID: number): Promise<any>;
     deleteSoftValues(UserID: Number): Promise<Prisma.BatchPayload>;
     OrderProduct(UserID: number): Promise<any>;
+    orderAdd(userId: number): Promise<any>;
     deleteCartData(UserID: number): Promise<void>;
     allOrderProduct(UserID: number): Promise<{
         findProduct: import(".prisma/client").Product[];

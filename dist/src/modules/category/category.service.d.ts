@@ -5,7 +5,7 @@ export declare class CategoryService {
     constructor(prismService: PrismaService);
     addCategory(categoryRes: CreateCategoryDto): Promise<any>;
     getAllCategories(): Promise<any>;
-    getAllCategory(page: number, pageSize: number): Promise<{
+    getAllCategory(): Promise<{
         data: {
             id: number;
             name: string;
