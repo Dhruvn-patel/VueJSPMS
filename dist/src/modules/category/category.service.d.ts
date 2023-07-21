@@ -7,8 +7,8 @@ export declare class CategoryService {
     getAllCategories(): Promise<any>;
     getAllCategory(): Promise<{
         data: {
-            id: number;
             name: string;
+            id: number;
         }[];
         totaldata: number;
     }>;

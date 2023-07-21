@@ -34,8 +34,8 @@ export declare class ProductsService {
             price: number;
             quantity: number;
             categoryNames: {
-                id: number;
                 name: string;
+                id: number;
             }[];
         }[];
     }>;
