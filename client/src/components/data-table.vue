@@ -89,15 +89,23 @@ import { computed, onMounted, onUpdated, ref } from 'vue';
 import 'jquery/dist/jquery.min.js';
 import 'datatables.net-dt/js/dataTables.dataTables';
 import 'datatables.net-dt/css/jquery.dataTables.min.css';
-import $ from 'jquery';
+
 import { userValidate } from '../helper/user/user.rules';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+
 export default {
   name: 'TheDataTable',
-  setup() {
+  props:{
+  rolesItem:{
+    type:Array
+  }
+},
+  setup(props) {
+
+    console.log(props.rolesItem);
     const users = ref([]);
     let form = ref('');
     let userData = ref([]);

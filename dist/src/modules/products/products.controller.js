@@ -82,14 +82,13 @@ let ProductsController = class ProductsController {
         });
     }
     async AllProducts(req, res, params) {
-        const { productsWithCategory } = await this.productsService.AllProducts(params.sortType);
         let searchParam = '';
         if (params.searchValue == 'undefined')
             searchParam = '';
         else
             searchParam = params.searchValue;
         console.log('params.searchValue', searchParam, params.sortType, params.id);
-        const allDataSearch = await this.productsService.allDataSearch(searchParam, params.sortType, params.id);
+        const allDataSearch = await this.productsService.allDataSearch(searchParam, params.sortType, params.id, params.priceStart, params.priceStop);
         return res.status(200).json({
             data: allDataSearch,
             errmsg: '',

@@ -51,11 +51,18 @@
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12">
+                  
                     <v-select
-                      :items="['Admin', 'User']"
+                      :items="Items"
+                      item-title="rolename"
+                      item-value="id"
                       label="Select Role*"
+                      v-model="rolesId"
                       :rules="userRules.select"
                       required
+                      persistent-hint
+                      return-object
+                      single-line
                     ></v-select>
                   </v-col>
                 </v-row>
@@ -80,7 +87,7 @@
     </v-row>
 
     <v-row justify="center">
-      <DataTable />
+      <DataTable :rolesItem="Items"/>
     </v-row>
   </v-app>
 </template>
@@ -108,11 +115,25 @@ export default {
     const form = ref('');
     const router = useRouter();
     const valid = ref(false);
+    const rolesId=ref();
+    let Items=ref([])
 
     /* rules computed */
     const userRules = computed(() => {
       return userValidate;
     });
+
+    onMounted(async()=>{
+    try {
+      const {data}=await axios.get( `${process.env.VUE_APP_URL}/roles`);
+     
+      Items.value=data
+    } catch (error) {
+      console.log(error);
+      return error
+    }
+  })
+
 
     async function submit() {
       const validate = await form.value.validate();
@@ -121,7 +142,7 @@ export default {
           name: name.value,
           email: email.value,
           password: password.value,
-          rolesId: '2',
+          rolesId: rolesId.value.id,
         };
         try {
           const result = await axios.post(
@@ -158,6 +179,8 @@ export default {
     }
 
     return {
+      rolesId,
+      Items,
       dialog,
       name,
       email,

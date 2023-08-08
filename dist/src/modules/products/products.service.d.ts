@@ -62,7 +62,7 @@ export declare class ProductsService {
         }[];
         totalData: number;
     }>;
-    allDataSearch(query: any, sortType: any, id: number): Promise<{
+    allDataSearch(query: any, sortType: any, id: number, priceStart: number, priceStop: number): Promise<{
         products: {
             id: number;
             ProductName: string;

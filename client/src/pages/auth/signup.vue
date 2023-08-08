@@ -98,7 +98,7 @@ export default {
               withCredentials: true,
             },
           );
-          // localStorage.setItem("token", JSON.stringify(result.Jwtoken));
+
           if (result.status === 402) {
             return Swal.fire({
               position: 'top-center',

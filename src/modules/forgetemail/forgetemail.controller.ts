@@ -14,6 +14,7 @@ import {
 import { ForgetemailService } from './forgetemail.service';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
+let otpGlobal = { otp: 0, email: '' };
 @Controller('forgetemail')
 export class ForgetemailController {
   constructor(
@@ -40,11 +41,11 @@ export class ForgetemailController {
     res: any,
   ) {
     return;
-    // const Opt = req.session.data;
-    // if (Opt) {
+    // const Otp = req.session.data;
+    // if (Otp) {
     //   return;
     // } else {
-    //   res.redirect('/forgetemail/forgot-password');
+    //   res.redirect('/forgetemail/  -password');
     // }
   }
 
@@ -68,16 +69,15 @@ export class ForgetemailController {
       const SendEmailandThrowOpt = await this.forgetemailService.sendMaildata(
         Dto,
       );
-
-      console.log('SendEmailandThrowOpt', SendEmailandThrowOpt);
-
       req.session.data = SendEmailandThrowOpt.token;
       req.session.email = SendEmailandThrowOpt.Email;
+      // otpGlobal = Number(SendEmailandThrowOpt.token);
+      otpGlobal.otp = Number(SendEmailandThrowOpt.token);
+      otpGlobal.email = SendEmailandThrowOpt.Email;
       return res.status(200).json({
         status: 200,
         data: result,
         message: `Enter OTP`,
-        otp: SendEmailandThrowOpt.token,
       });
     }
   }
@@ -89,26 +89,30 @@ export class ForgetemailController {
     @Res()
     res: any,
     @Body() Data: string,
-    @Session() session,
+    @Session() session: Record<number, any>,
   ): Promise<any> {
-    const Opt = req.session.data;
-    const email = req.session.email;
-    const otpIsValid = req.session.otpIsValid;
+    // const Otp = req.session.data;
+    // const email = req.session.email;
+    // const otpIsValid = req.session.otpIsValid;
 
+    const Otp = otpGlobal.otp;
+    const email = otpGlobal.email;
+    console.log('otpGlobal', otpGlobal);
     if (email) {
       const result: any = await this.forgetemailService.ChangePassword(
         Data,
         email,
       );
       console.log('result', result);
-
       if (result.status == 400) {
         return res.status(400).json({
           status: 400,
-          data: '',
+          data: 'Otp not match',
         });
       } else {
         req.session.destroy();
+        delete otpGlobal.otp;
+        delete otpGlobal.email;
         return res.status(200).json({
           status: 200,
           data: result,
@@ -125,28 +129,37 @@ export class ForgetemailController {
     res: any,
     @Body() Dto: string,
     @Body() userEnterOtp: string,
-    @Session() session,
+    @Session() session: Record<number, any>,
   ): Promise<any> {
-    console.log(userEnterOtp);
-    const Opt = req.session.data;
-    if (Opt) {
-      const result: any = await this.forgetemailService.checkOtp(
-        Opt,
-        userEnterOtp,
-      );
+    try {
+      const Otp = otpGlobal.otp;
+      console.log(userEnterOtp, Otp);
 
-      if (result.status == 200) {
-        req.session.otpIsValid = true;
-        return res.status(200).json({
-          status: 200,
-          data: result,
-        });
-      } else {
-        return res.status(400).json({
-          status: 400,
-          data: '',
-        });
+      if (Otp) {
+        const result: any = await this.forgetemailService.checkOtp(
+          Otp,
+          userEnterOtp,
+        );
+
+        if (result.status == 200) {
+          req.session.otpIsValid = true;
+          return res.status(200).json({
+            status: 200,
+            data: result,
+          });
+        } else {
+          return res.status(400).json({
+            status: 400,
+            data: '',
+          });
+        }
       }
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        status: 400,
+        data: '',
+      });
     }
   }
 }

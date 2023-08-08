@@ -10,11 +10,14 @@ import NotFound from '../pages/page-not-found/not-found.vue';
 import OrderPage from '../pages/cart/order.vue';
 import Cart from '../pages/cart/cart.vue';
 import jwt_decode from 'jwt-decode';
-
+import ForgetPassword from '../pages/auth/forget-password.vue';
+import OrderHistory from '../pages/cart/orderhistory.vue';
+import OTP from '../pages/auth/otp.vue';
 function decodedata() {
   const token = localStorage.getItem('token') || '';
+  if (!token) return null;
+  console.log('token', token);
   const decoded: any = jwt_decode(token);
-  console.log('token', decoded);
   localStorage.setItem(
     'loginUser',
     JSON.stringify({ userId: decoded.userId, isLogin: true }),
@@ -60,6 +63,7 @@ function guardMyroute(to: any, from: any, next: any) {
 
 function redirectBased(to: any, from: any, next: any) {
   const decoded: any = decodedata();
+  if (decoded === null) return next('/login');
   if (decoded.roles === 1) next('/dashboard');
   else next('/home');
 }
@@ -121,6 +125,17 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: guardMySign,
   },
   {
+    name: 'ForgetPassword',
+    path: '/forgetpassword',
+    component: ForgetPassword,
+    // beforeEnter: guardMySign,
+  },
+  {
+    name: 'ForgetPasswordOtp',
+    path: '/forgetpassword/otp',
+    component: OTP,
+  },
+  {
     name: 'Home',
     path: '/home',
     component: HomePage,
@@ -131,6 +146,12 @@ const routes: Array<RouteRecordRaw> = [
     name: 'order',
     path: '/order',
     component: OrderPage,
+    beforeEnter: guardMyroute,
+  },
+  {
+    name: 'orderHistory',
+    path: '/orderhistory',
+    component: OrderHistory,
     beforeEnter: guardMyroute,
   },
 ];

@@ -38,7 +38,6 @@ let ProductsService = class ProductsService {
                 },
                 include: { ProductCategory: true },
             });
-            return productdata;
         }
         catch (error) {
             return error;
@@ -422,7 +421,7 @@ let ProductsService = class ProductsService {
             throw new Error('Failed to search products');
         }
     }
-    async allDataSearch(query, sortType, id) {
+    async allDataSearch(query, sortType, id, priceStart, priceStop) {
         let productIds;
         if (!isNaN(id)) {
             productIds = await prisma.productCategory.findMany({
@@ -452,6 +451,10 @@ let ProductsService = class ProductsService {
                         },
                     },
                 ],
+                price: {
+                    lte: Number(priceStop),
+                    gte: Number(priceStart),
+                },
                 id: {
                     in: productIds.map((product) => product.productId),
                 },
@@ -461,6 +464,10 @@ let ProductsService = class ProductsService {
             data = {
                 id: {
                     in: productIds.map((product) => product.productId),
+                },
+                price: {
+                    lte: Number(priceStop),
+                    gte: Number(priceStart),
                 },
             };
         }
@@ -478,11 +485,19 @@ let ProductsService = class ProductsService {
                         },
                     },
                 ],
+                price: {
+                    lte: Number(priceStop),
+                    gte: Number(priceStart),
+                },
             };
         }
         else {
-            data: {
-            }
+            data = {
+                price: {
+                    lte: Number(priceStop),
+                    gte: Number(priceStart),
+                },
+            };
         }
         try {
             const productsData = await this.prismService.product.findMany({

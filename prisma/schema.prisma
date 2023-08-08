@@ -19,17 +19,28 @@ model User {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @default(now()) @updatedAt
   deletedAt    DateTime?
-  // Roles     Roles?    @relation(fields: [rolesId], references: [id], onDelete: Cascade)
+   Roles     Roles?    @relation(fields: [rolesId], references: [id], onDelete: Cascade)
   rolesId      Int            @default(2)
   CartAdd      Cart[]
   Order        Order[]
   OrderProduct OrderProduct[]
+  UserPermissions UserPermissions[]
 }
 
 model Roles {
   id               Int                @id @default(autoincrement())
   rolename         String
   Rolespermissions RolesPermissions[]
+  User User[]
+
+}
+
+model UserPermissions{
+  User  User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  Int
+  Permissions   Permissions? @relation(fields: [permissionsId], references: [id], onDelete: Cascade)
+  permissionsId Int
+   @@id([userId, permissionsId])
 }
 
 model Permissions {
@@ -37,6 +48,7 @@ model Permissions {
   permissionName   String
   createdAt        DateTime           @default(now())
   RolesPermissions RolesPermissions[]
+  UserPermissions UserPermissions[]
 }
 
 model RolesPermissions {

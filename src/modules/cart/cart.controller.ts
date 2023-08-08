@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {
   Controller,
   Get,
@@ -52,12 +51,13 @@ export class CartController {
   @UseGuards(AuthGuard)
   @Get()
   async displayCart(@Req() req, @Res() res) {
-    const { token } = req.cookies['JWT_TOKEN'];
+    // const { token } = req.cookies['JWT_TOKEN'];
 
-    let tokendata;
-    if (token == undefined) {
-      tokendata;
-    }
+    // let tokendata;
+    const token = req.headers.authorization.split(' ')[1];
+    // if (token == undefined) {
+    //   tokendata;
+    // }
     const dataget = await this.jwtService.verifyAsync(token, {
       secret: process.env.JWT_SECRET_USER,
     });
@@ -76,20 +76,28 @@ export class CartController {
     return res.render('cart', { products });
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('history')
   async displayOrderHistory(@Req() req, @Res() res) {
-    const { token } = req.cookies['JWT_TOKEN'];
+    // const { token } = req.cookies['JWT_TOKEN'];
+    const token = req.headers.authorization.split(' ')[1];
     const dataget = await this.jwtService.verifyAsync(token, {
       secret: process.env.JWT_SECRET_USER,
     });
     const { email, name, userId } = dataget;
     const historydata = await this.cartService.allhistoryData(userId);
-    const data = historydata.listOderedProducts;
+    let data = historydata.listOderedProducts;
 
-    return res.render('orderhistory', {
+    const productdeatils = historydata.listOdered;
+
+    // return res.render('orderhistory', {
+    //   data,
+    //   productdeatils: historydata.listOdered,
+    // });
+
+    return res.status(200).json({
       data,
-      productdeatils: historydata.listOdered,
+      productdeatils,
     });
   }
 
@@ -234,6 +242,7 @@ export class CartController {
     }
   }
 
+  /* restore cart data */
   @Get('getCartData')
   async getRestoreCartData(@Req() req, @Res() res) {
     const authHeader = req.headers.authorization;

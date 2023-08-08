@@ -11,8 +11,6 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { HomeModule } from './modules/home/home.module';
 import { ForgetemailModule } from './modules/forgetemail/forgetemail.module';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
-import { join } from 'path';
 import { ProductsModule } from './modules/products/products.module';
 import { CategoryModule } from './modules/category/category.module';
 import { CartModule } from './modules/cart/cart.module';
@@ -24,6 +22,9 @@ import { JwtService } from '@nestjs/jwt';
 
 import { NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { CommonMiddleware } from './common/common.middleware';
+import { RolesModule } from './modules/roles/roles.module';
+import { PermissionsModule } from './modules/permissions/permissions.module';
+
 @Global()
 @Module({
   imports: [
@@ -56,6 +57,8 @@ import { CommonMiddleware } from './common/common.middleware';
         },
       },
     }),
+    RolesModule,
+    PermissionsModule,
   ],
   controllers: [AppController],
   providers: [

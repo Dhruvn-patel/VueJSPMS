@@ -85,7 +85,7 @@ export class SigninController {
       } else {
         res.cookie('JWT_TOKEN', responseToken, { httpOnly: true });
         session.roles = responseToken.roles;
-        res.status(200).json({    
+        res.status(200).json({
           errmsg: 'Successfully login',
           data: responseToken.token,
           roles: responseToken.roles,
@@ -99,7 +99,9 @@ export class SigninController {
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() req) {}
+  async googleAuth(@Req() req, @Res() res) {
+    return res.redirect('/signin/redirect');
+  }
 
   @Get('redirect')
   @UseGuards(AuthGuard('google'))
@@ -108,7 +110,20 @@ export class SigninController {
     @Res({ passthrough: true }) res,
   ): Promise<any> {
     const googleres = await this.signinService.googleLogin(req, res);
-    console.log(googleres);
+    console.log('googleres', googleres);
     return res.redirect('/home');
   }
+
+  // @Get('redirect')
+  // @UseGuards(AuthGuard('google'))
+  // async googleAuthRedirect(
+  //   @Req() req,
+  //   @Res({ passthrough: true }) res,
+  // ): Promise<any> {
+  //   console.log('req', req);
+
+  //   const googleres = await this.signinService.googleLogin(req, res);
+  //   console.log('googleres', googleres);
+  //   return res.send('htl');
+  // }
 }

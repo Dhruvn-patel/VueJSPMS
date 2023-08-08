@@ -33,7 +33,6 @@ export class ProductsService {
         },
         include: { ProductCategory: true },
       });
-      return productdata;
     } catch (error) {
       return error;
     }
@@ -493,8 +492,15 @@ export class ProductsService {
     }
   }
   /* AllDataSearch  */
-  async allDataSearch(query: any, sortType: any, id: number) {
+  async allDataSearch(
+    query: any,
+    sortType: any,
+    id: number,
+    priceStart: number,
+    priceStop: number,
+  ) {
     let productIds: any;
+
     if (!isNaN(id)) {
       productIds = await prisma.productCategory.findMany({
         where: {
@@ -507,6 +513,7 @@ export class ProductsService {
     } else {
       productIds = [];
     }
+
     let data: any;
     if (query && id > 0) {
       data = {
@@ -522,6 +529,11 @@ export class ProductsService {
             },
           },
         ],
+
+        price: {
+          lte: Number(priceStop),
+          gte: Number(priceStart),
+        },
         id: {
           in: productIds.map((product) => product.productId),
         },
@@ -530,6 +542,10 @@ export class ProductsService {
       data = {
         id: {
           in: productIds.map((product) => product.productId),
+        },
+        price: {
+          lte: Number(priceStop),
+          gte: Number(priceStart),
         },
       };
     } else if (query) {
@@ -546,10 +562,19 @@ export class ProductsService {
             },
           },
         ],
+
+        price: {
+          lte: Number(priceStop),
+          gte: Number(priceStart),
+        },
       };
     } else {
-      data: {
-      }
+      data = {
+        price: {
+          lte: Number(priceStop),
+          gte: Number(priceStart),
+        },
+      };
     }
 
     try {
@@ -558,6 +583,7 @@ export class ProductsService {
         orderBy: {
           price: sortType,
         },
+
         include: {
           ProductCategory: {
             include: {

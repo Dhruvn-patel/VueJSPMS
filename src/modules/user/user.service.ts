@@ -24,7 +24,9 @@ export class UserService {
           name: createUserDto.name,
           rolesId: Number(rolesId),
           password: hashpassword,
+          
         },
+      
       });
       return data;
     } catch (error) {

@@ -29,7 +29,14 @@
           <v-icon color="primary" icon="mdi-cart-minus" class=""> </v-icon>
         </v-badge>
       </v-btn>
-      <!-- <v-btn flat to="/"></v-btn> -->
+      <v-btn flat :to="{ name: 'orderHistory' }" class="text-none" stacked>
+        <v-icon
+          color="primary"
+          icon="mdi-order-bool-descending-variant"
+          class=""
+        >
+        </v-icon>
+      </v-btn>
       <v-btn flat @click="SignOutFunction" v-if="isLogin == true"
         >Log Out
       </v-btn>

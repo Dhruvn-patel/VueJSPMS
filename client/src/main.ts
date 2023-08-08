@@ -1,4 +1,4 @@
-import { createApp } from 'vue';
+import Vue, { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 import store from './store';
@@ -7,7 +7,8 @@ import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import VueAxios from 'vue-axios';
 import axios from 'axios';
-import GAuth from 'vue-google-oauth2';
+// import GAuth from 'vue-google-oauth2';
+import vue3GoogleLogin from 'vue3-google-login';
 const app = createApp(App);
 const options = {
   confirmButtonColor: '#41b882',
@@ -15,13 +16,15 @@ const options = {
 };
 
 const googleOption = {
-  clientId: process.env.GOOGLE_CLIENT_ID,
+  clientId:
+    '466822532146-adhthi16ea4bm0qlcvkfbku4d2m1667r.apps.googleusercontent.com',
   scope: 'profile email',
-  prompt: 'select_account',
+  // prompt: 'select_account',
 };
+
 app
   .use(router)
-  // .use(GAuth, googleOption)
+  .use(vue3GoogleLogin, googleOption)
   .use(VueAxios, axios)
   .use(store)
   .use(VueSweetalert2, options)

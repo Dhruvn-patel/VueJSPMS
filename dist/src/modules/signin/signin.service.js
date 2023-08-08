@@ -66,6 +66,7 @@ let SigninService = class SigninService {
         return token;
     }
     async googleLogin(req, res) {
+        console.log('google', req);
         if (!req.user.email) {
             return 'No user from google';
         }

@@ -19,15 +19,13 @@ export class ForgetemailService {
     const token = generateOTP();
 
     try {
-      await this.mailerService
-        .sendMail({
-          to: `${Email}`,
-          from: 'esparkdhruv@gmail.com',
-          subject: 'Forgot Password Change',
-          text: 'OTP for Reset Password',
-          html: `<b> ${token} <b>`,
-        })
-     
+      await this.mailerService.sendMail({
+        to: `${Email}`,
+        from: 'esparkdhruv@gmail.com',
+        subject: 'Forgot Password Change',
+        text: 'OTP for Reset Password',
+        html: `<b> ${token} <b>`,
+      });
     } catch (error) {
       console.log(error);
     }
@@ -47,6 +45,7 @@ export class ForgetemailService {
       return new BadRequestException();
     } catch (error) {
       return new BadRequestException();
+      // return error;
     }
   }
 

@@ -10,6 +10,6 @@ export declare class ForgetemailController {
     getchangePassword(req: any, res: any): void;
     roota(req: any, res: any): void;
     getAddCategory(req: any, res: any, Dto: string, session: Record<number, any>): Promise<any>;
-    getChangePassword(req: any, res: any, Data: string, session: any): Promise<any>;
-    getcheckOtp(req: any, res: any, Dto: string, userEnterOtp: string, session: any): Promise<any>;
+    getChangePassword(req: any, res: any, Data: string, session: Record<number, any>): Promise<any>;
+    getcheckOtp(req: any, res: any, Dto: string, userEnterOtp: string, session: Record<number, any>): Promise<any>;
 }

@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <Header />
     <v-main class="my-5">
       <v-container class="d-flex justify-space-evenly">
         <v-card class="d-flex flex-column" width="60vh">
@@ -71,8 +72,12 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import Header from '../../components/header.vue';
 export default {
   name: 'TheOrder',
+  components: {
+    Header,
+  },
   setup() {
     const router = useRouter();
     let order = ref([]);

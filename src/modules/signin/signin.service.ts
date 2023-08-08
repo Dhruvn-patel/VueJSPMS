@@ -84,6 +84,8 @@ export class SigninService {
 
   /* google token  */
   async googleLogin(@Req() req, @Res() res) {
+    console.log('google', req);
+
     if (!req.user.email) {
       return 'No user from google';
     }

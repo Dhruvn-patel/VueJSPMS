@@ -8,6 +8,6 @@ export declare class SigninController {
     constructor(signinService: SigninService, jwtService: JwtService);
     showLogin(req: any, res: any): Promise<void>;
     signIn(authsignin: AuthLoginDto, req: Request, res: any, session: Record<string, any>): Promise<any>;
-    googleAuth(req: any): Promise<void>;
+    googleAuth(req: any, res: any): Promise<any>;
     googleAuthRedirect(req: any, res: any): Promise<any>;
 }

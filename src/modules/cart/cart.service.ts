@@ -7,10 +7,12 @@ import {
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 const prisma = new PrismaClient();
 
 @Injectable()
 export class CartService {
+  constructor(private prismService: PrismaService) {}
   async AddItemsCart(userId: number, productId: number) {
     try {
       const checkIfExists = await prisma.cart.findFirst({
@@ -99,19 +101,54 @@ export class CartService {
     const findProductFromCart = await prisma.cart.findMany({
       where: {
         userId: Number(userId),
-        deleted: true,
+        deleted: false,
+      },
+      select: {
+        productId: true,
       },
     });
 
-    const cartRestoreArr = [];
-    // findProductFromCart.map((user) => {
-    //   if (user.userId === userId) {
+    try {
+      const productsData = await this.prismService.product.findMany({
+        include: {
+          ProductCategory: {
+            include: {
+              Categories: true,
+            },
+          },
+        },
+      });
 
+      const productsWithCategory = productsData.map((product) => {
+        const categoryNames = product.ProductCategory.map(
+          (productCategory) => productCategory.Categories.name,
+        );
+        return {
+          id: product.id,
+          ProductName: product.ProductName,
+          description: product.description,
+          image: product.image,
+          totalPrice: product.quantity * product.price,
+          price: product.price,
+          quantity: product.quantity,
+          categoryNames: categoryNames,
+        };
+      });
+      const listCartData = [];
+      let totalRestoreCart = 0;
+      for (let i = 0; i < findProductFromCart.length; i++) {
+        for (let j = 0; j < productsWithCategory.length; j++) {
+          if (findProductFromCart[i].productId === productsWithCategory[j].id) {
+            listCartData.push(productsWithCategory[j]);
+            totalRestoreCart += productsWithCategory[j].totalPrice;
+          }
+        }
+      }
 
-    //   }
-    // });
-
-    console.log(findProductFromCart, findProductFromCart);
+      return { listCartData, totalRestoreCart };
+    } catch (error) {
+      throw new Error('Failed to fetch product data');
+    }
   }
   // async quantityCart(UserID: number, productId: number, quantity: number) {
   //   return await prisma.cart.update({

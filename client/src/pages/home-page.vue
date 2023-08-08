@@ -37,7 +37,15 @@
             <v-icon color="primary" icon="mdi-cart-minus" class=""> </v-icon>
           </v-badge>
         </v-btn>
-        <!-- <v-btn flat to="/"></v-btn> -->
+        <v-btn flat :to="{ name: 'orderHistory' }" class="text-none" stacked>
+          <v-icon
+            color="primary"
+            icon="mdi-order-bool-descending-variant"
+            class=""
+          >
+          </v-icon>
+        </v-btn>
+
         <v-btn flat @click="SignOutFunction" v-if="isLogin == true"
           >Log Out
         </v-btn>
@@ -62,25 +70,35 @@
           <v-divider></v-divider>
           <v-list-item>
             <v-list-item-title class="text-h6 py-3">Category</v-list-item-title>
-            <v-select
-              @update:modelValue="categoryWiseProduct"
-              label="Select Categories*"
+            <v-checkbox
+              class="pa-0 ma-0"
+              v-for="availableWeekday in category"
               v-model="categories"
-              :items="category"
-              item-title="name"
-              item-value="id"
-              name="category"
-              persistent-hint
-              return-object
-              single-line
-            >
-            </v-select>
+              :key="availableWeekday"
+              :value="availableWeekday.id"
+              :label="availableWeekday.name"
+              @update:modelValue="categoryWiseProduct"
+            ></v-checkbox>
+          </v-list-item>
+          <v-divider></v-divider>
+          <v-list-item class="mt-2">
+            <v-list-item-title class="text-h6 py-3">Price</v-list-item-title>
+
+            <v-range-slider
+              v-model="price"
+              step="100"
+              :min="100"
+              :max="300000"
+              thumb-label="always"
+              class="pa-3"
+              @update:modelValue="priceWiseProduct"
+            ></v-range-slider>
           </v-list-item>
         </v-list>
       </v-navigation-drawer>
       <v-main>
         <v-content>
-          <v-container class="ma-8 d-flex flex-wrap">
+          <v-container class="ma-8 d-flex flex-wrap" v-if="products.length > 0">
             <v-card
               application
               class="mx-5 my-3 d-flex flex-column ma-2 pa-2"
@@ -133,6 +151,9 @@
               </v-card-actions>
             </v-card>
           </v-container>
+          <v-container v-else class="d-flex justify-center align-center">
+            <div class="text-center">Not Found Data</div>
+          </v-container>
         </v-content>
       </v-main>
     </v-layout>
@@ -150,6 +171,7 @@ import { useTheme } from 'vuetify/lib/framework.mjs';
 export default {
   name: 'TheHomePage',
   setup() {
+    let price = ref([100, 200000]);
     const store = useStore();
     const router = useRouter();
     const categories = ref();
@@ -233,6 +255,8 @@ export default {
               sortType: selectedValue.value,
               searchValue: serachValue.value,
               id: categories.value ? categories.value.id : 0,
+              priceStart: price.value[0],
+              priceStop: price.value[1],
             },
           },
         );
@@ -290,8 +314,10 @@ export default {
         const { data } = await axios.get(
           `${process.env.VUE_APP_URL}/category/getCategory`,
         );
+        console.log(data);
         category.value = data.data;
       } catch (error) {
+        console.log(error);
         return Swal.fire({
           position: 'top-center',
           icon: 'warning',
@@ -303,11 +329,26 @@ export default {
       }
 
       /* cart restore */
-      const resultData = await axios.get(
-        `${process.env.VUE_APP_URL}/cart/getCartData`,
-      );
+      //   const resultData = await axios.get(
+      //     `${process.env.VUE_APP_URL}/cart/getCartData`,
+      //   );
 
-      console.log('resultData', resultData);
+      //   if (resultData.data.data.listCartData.length > 0) {
+      //     console.log('resultData', resultData.data);
+      //     window.localStorage.setItem(
+      //       'cart',
+      //       JSON.stringify(resultData.data.data.listCartData),
+      //     );
+      //     window.localStorage.setItem(
+      //       'cartCount',
+      //       JSON.stringify(resultData.data.data.listCartData.length),
+      //     );
+
+      //     window.localStorage.setItem(
+      //       'totalPay',
+      //       JSON.stringify(resultData.data.data.totalRestoreCart),
+      //     );
+      //   }
       const productData = await axios.get(
         `${process.env.VUE_APP_URL}/products/listProduct`,
         {
@@ -315,6 +356,8 @@ export default {
             sortType: 'asc',
             searchValue: '',
             id: 0,
+            priceStart: price.value[0],
+            priceStop: price.value[1],
           },
         },
       );
@@ -327,6 +370,7 @@ export default {
       categoryWiseProduct();
       sortFunction();
       searchValueFunction();
+      priceWiseProduct();
     });
 
     /* sort frontend */
@@ -338,7 +382,9 @@ export default {
             params: {
               sortType: selectedValue.value,
               searchValue: '',
-              id: categories.value ? categories.value.id : 0,
+              id: categories.value,
+              priceStart: price.value[0],
+              priceStop: price.value[1],
             },
           },
         );
@@ -357,7 +403,9 @@ export default {
             params: {
               sortType: 'asc',
               searchValue: '',
-              id: categories.value ? categories.value.id : 0,
+              id: categories.value,
+              priceStart: price.value[0],
+              priceStop: price.value[1],
             },
           },
         );
@@ -367,8 +415,29 @@ export default {
         return error;
       }
     };
-
+    const priceWiseProduct = async () => {
+      try {
+        console.log('price ==>', price.value);
+        const productData = await axios.get(
+          `${process.env.VUE_APP_URL}/products/listProduct`,
+          {
+            params: {
+              sortType: 'asc',
+              searchValue: '',
+              id: categories.value,
+              priceStart: price.value[0],
+              priceStop: price.value[1],
+            },
+          },
+        );
+        products.value = productData.data.data.products;
+        console.log('productData', productData.data.data.products);
+      } catch (error) {
+        return error;
+      }
+    };
     return {
+      priceWiseProduct,
       category,
       categories,
       products,
@@ -389,6 +458,7 @@ export default {
       toggleTheme,
       SignOutFunction,
       content,
+      price,
     };
   },
 };

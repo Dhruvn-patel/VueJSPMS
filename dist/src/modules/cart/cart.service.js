@@ -5,12 +5,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CartService = void 0;
 const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
+const prisma_service_1 = require("../../prisma/prisma.service");
 const prisma = new client_1.PrismaClient();
 let CartService = class CartService {
+    constructor(prismService) {
+        this.prismService = prismService;
+    }
     async AddItemsCart(userId, productId) {
         try {
             const checkIfExists = await prisma.cart.findFirst({
@@ -86,11 +93,50 @@ let CartService = class CartService {
         const findProductFromCart = await prisma.cart.findMany({
             where: {
                 userId: Number(userId),
-                deleted: true,
+                deleted: false,
+            },
+            select: {
+                productId: true,
             },
         });
-        const cartRestoreArr = [];
-        console.log(findProductFromCart, findProductFromCart);
+        try {
+            const productsData = await this.prismService.product.findMany({
+                include: {
+                    ProductCategory: {
+                        include: {
+                            Categories: true,
+                        },
+                    },
+                },
+            });
+            const productsWithCategory = productsData.map((product) => {
+                const categoryNames = product.ProductCategory.map((productCategory) => productCategory.Categories.name);
+                return {
+                    id: product.id,
+                    ProductName: product.ProductName,
+                    description: product.description,
+                    image: product.image,
+                    totalPrice: product.quantity * product.price,
+                    price: product.price,
+                    quantity: product.quantity,
+                    categoryNames: categoryNames,
+                };
+            });
+            const listCartData = [];
+            let totalRestoreCart = 0;
+            for (let i = 0; i < findProductFromCart.length; i++) {
+                for (let j = 0; j < productsWithCategory.length; j++) {
+                    if (findProductFromCart[i].productId === productsWithCategory[j].id) {
+                        listCartData.push(productsWithCategory[j]);
+                        totalRestoreCart += productsWithCategory[j].totalPrice;
+                    }
+                }
+            }
+            return { listCartData, totalRestoreCart };
+        }
+        catch (error) {
+            throw new Error('Failed to fetch product data');
+        }
     }
     async getCartItems(UserID, type) {
         try {
@@ -335,7 +381,8 @@ let CartService = class CartService {
     }
 };
 CartService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], CartService);
 exports.CartService = CartService;
 //# sourceMappingURL=cart.service.js.map

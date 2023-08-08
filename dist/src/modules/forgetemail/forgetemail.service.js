@@ -26,8 +26,7 @@ let ForgetemailService = class ForgetemailService {
         const Name = email.email;
         const token = generateOTP();
         try {
-            await this.mailerService
-                .sendMail({
+            await this.mailerService.sendMail({
                 to: `${Email}`,
                 from: 'esparkdhruv@gmail.com',
                 subject: 'Forgot Password Change',

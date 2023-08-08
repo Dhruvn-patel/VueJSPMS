@@ -28,6 +28,8 @@ const config_1 = require("@nestjs/config");
 const mail_module_1 = require("./modules/mail/mail.module");
 const jwt_1 = require("@nestjs/jwt");
 const common_middleware_1 = require("./common/common.middleware");
+const roles_module_1 = require("./modules/roles/roles.module");
+const permissions_module_1 = require("./modules/permissions/permissions.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(common_middleware_1.CommonMiddleware).forRoutes();
@@ -62,6 +64,8 @@ AppModule = __decorate([
                     tls: {},
                 },
             }),
+            roles_module_1.RolesModule,
+            permissions_module_1.PermissionsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

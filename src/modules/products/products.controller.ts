@@ -78,7 +78,6 @@ export class ProductsController {
     @Req() req,
     @Res() res,
   ) {
-  
     const data = this.productsService.uploadSingleFile(
       file,
       name,
@@ -86,7 +85,6 @@ export class ProductsController {
       price,
       quantity,
       categoryIds,
-    
     );
     return res.status(200).json({
       data: data,
@@ -145,7 +143,6 @@ export class ProductsController {
     @Req() req,
     @Res() res,
   ) {
-  
     const data = this.productsService.addProductWithImg(
       file,
       name,
@@ -153,7 +150,6 @@ export class ProductsController {
       price,
       quantity,
       categoryIds,
- 
     );
     return res.status(200).json({
       data: data,
@@ -176,7 +172,6 @@ export class ProductsController {
     @Req() req,
     @Res() res,
   ) {
-  
     const data = await this.productsService.updateProductById(
       file,
       name,
@@ -185,7 +180,6 @@ export class ProductsController {
       quantity,
       categoryIds,
       Id,
-
     );
 
     return res.status(200).json({
@@ -203,8 +197,6 @@ export class ProductsController {
     @Req() req,
     @Res() res,
   ) {
-  
-
     const data = await this.productsService.deleteProduct(id);
     return res.status(200).json({
       data: data,
@@ -234,9 +226,9 @@ export class ProductsController {
    */
   @Get('listProduct')
   async AllProducts(@Req() req, @Res() res, @Query() params) {
-    const { productsWithCategory } = await this.productsService.AllProducts(
-      params.sortType,
-    );
+    // const { productsWithCategory } = await this.productsService.AllProducts(
+    //   params.sortType,
+    // );
     // sortType=${data}&searchValue=&id=${0}
 
     let searchParam = '';
@@ -244,12 +236,16 @@ export class ProductsController {
     else searchParam = params.searchValue;
     console.log('params.searchValue', searchParam, params.sortType, params.id);
 
+    //price
+    // console.log(params.priceStart, params.priceStop);
+
     const allDataSearch = await this.productsService.allDataSearch(
       searchParam,
       params.sortType,
       params.id,
+      params.priceStart,
+      params.priceStop,
     );
-
     return res.status(200).json({
       data: allDataSearch,
       errmsg: '',

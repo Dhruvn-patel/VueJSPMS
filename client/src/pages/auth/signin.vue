@@ -40,12 +40,18 @@
             <v-btn block class="mb-8" size="large" @click="googleSign">
               Signin with google
             </v-btn>
-
+            <!-- <GoogleLogin :callback="callback" prompt auto-login /> -->
             <router-link
-              to="/register"
+              :to="{ name: 'Register' }"
               class="v-btn v-btn--block v-btn--elevated v-theme--light v-btn--density-default v-btn--size-large v-btn--variant-elevated mb-8"
             >
               Create new Account
+            </router-link>
+            <router-link
+              :to="{ name: 'ForgetPassword' }"
+              class="v-btn v-btn--block v-btn--elevated v-theme--light v-btn--density-default v-btn--size-large v-btn--variant-elevated mb-8"
+            >
+              Forget Password
             </router-link>
           </v-form>
         </v-container>
@@ -62,6 +68,7 @@ import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 import { useStore } from 'vuex';
 import {} from '../../plugins/axios.plugin';
+import { googleSdkLoaded } from 'vue3-google-login';
 export default {
   name: 'TheSignin',
   setup() {
@@ -71,7 +78,7 @@ export default {
     const form = ref('');
     const router = useRouter();
     const store = useStore();
-
+    const clientId = process.env.GOOGLE_CLIENT_ID;
     /* rules computed */
     const userRules = computed(() => {
       return userValidate;
@@ -83,9 +90,14 @@ export default {
     };
 
     const googleSign = async () => {
-      await fetch(`${process.env.VUE_APP_URL}/signin/google`);
-      // await axios.get(`${process.env.VUE_APP_URL}/signin/google`);
-
+      try {
+        const data = await axios.get(
+          `${process.env.VUE_APP_URL}/signin/google`,
+        );
+        console.log('user', data);
+      } catch (error) {
+        console.log(error);
+      }
       Swal.fire({
         position: 'top-center',
         icon: 'success',
@@ -95,6 +107,7 @@ export default {
         timer: 1000,
       });
     };
+
     async function submit() {
       const validate = await form.value.validate();
       if (validate.valid) {
@@ -142,6 +155,7 @@ export default {
     }
 
     return {
+      clientId,
       submit,
       email,
       password,
@@ -149,6 +163,7 @@ export default {
       form,
       userRules,
       showPassword,
+
       logOutFunction,
     };
   },

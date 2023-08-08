@@ -9,7 +9,9 @@ const swagger_1 = require("@nestjs/swagger");
 const session = require("express-session");
 require('dotenv').config({ path: `../.env` });
 async function bootstrap() {
-    const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const app = await core_1.NestFactory.create(app_module_1.AppModule, {
+        bodyParser: true,
+    });
     const config = new swagger_1.DocumentBuilder()
         .setTitle('Product Management')
         .setDescription('This documentation contains all the information about product management Api')
@@ -19,13 +21,17 @@ async function bootstrap() {
     swagger_1.SwaggerModule.setup('api', app, document);
     app.useStaticAssets((0, path_1.join)(__dirname, '../../', 'public'));
     app.setBaseViewsDir((0, path_1.join)(__dirname, '../../', 'views'));
-    app.enableCors({ credentials: true, origin: true });
+    app.enableCors({
+        credentials: true,
+        origin: ['http://localhost:3030', 'http://localhost:8080'],
+    });
     app.use(session({
         secret: process.env.SESSION_SECRET,
         resave: true,
         saveUninitialized: false,
         cookie: {
             maxAge: 500000,
+            domain: 'localhost',
         },
     }));
     app.useBodyParser('json', { limit: '200mb' });

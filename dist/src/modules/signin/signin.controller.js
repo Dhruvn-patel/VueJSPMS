@@ -86,10 +86,12 @@ let SigninController = class SigninController {
             console.log(error.message);
         }
     }
-    async googleAuth(req) { }
+    async googleAuth(req, res) {
+        return res.redirect('/signin/redirect');
+    }
     async googleAuthRedirect(req, res) {
         const googleres = await this.signinService.googleLogin(req, res);
-        console.log(googleres);
+        console.log('googleres', googleres);
         return res.redirect('/home');
     }
 };
@@ -116,8 +118,9 @@ __decorate([
     (0, common_1.Get)('google'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
     __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], SigninController.prototype, "googleAuth", null);
 __decorate([

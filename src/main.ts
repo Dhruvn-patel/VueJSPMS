@@ -9,7 +9,9 @@ import { config } from 'dotenv';
 import * as session from 'express-session';
 require('dotenv').config({ path: `../.env` });
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bodyParser: true,
+  });
   const config = new DocumentBuilder()
     .setTitle('Product Management')
     .setDescription(
@@ -21,14 +23,24 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   app.useStaticAssets(join(__dirname, '../../', 'public'));
   app.setBaseViewsDir(join(__dirname, '../../', 'views'));
-  app.enableCors({ credentials: true, origin: true });
+  app.enableCors({
+    // origin: true,
+    credentials: true,
+    // exposedHeaders: ['set-cookie'],
+    origin: ['http://localhost:3030', 'http://localhost:8080'],
+  });
+
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
       resave: true,
       saveUninitialized: false,
+
       cookie: {
         maxAge: 500000,
+        domain: 'localhost',
+        // secure: true,
+        // sameSite: 'none',
       },
     }),
   );

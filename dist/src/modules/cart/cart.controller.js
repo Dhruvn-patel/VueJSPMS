@@ -37,11 +37,7 @@ let CartController = class CartController {
         });
     }
     async displayCart(req, res) {
-        const { token } = req.cookies['JWT_TOKEN'];
-        let tokendata;
-        if (token == undefined) {
-            tokendata;
-        }
+        const token = req.headers.authorization.split(' ')[1];
         const dataget = await this.jwtService.verifyAsync(token, {
             secret: process.env.JWT_SECRET_USER,
         });
@@ -57,16 +53,17 @@ let CartController = class CartController {
         return res.render('cart', { products });
     }
     async displayOrderHistory(req, res) {
-        const { token } = req.cookies['JWT_TOKEN'];
+        const token = req.headers.authorization.split(' ')[1];
         const dataget = await this.jwtService.verifyAsync(token, {
             secret: process.env.JWT_SECRET_USER,
         });
         const { email, name, userId } = dataget;
         const historydata = await this.cartService.allhistoryData(userId);
-        const data = historydata.listOderedProducts;
-        return res.render('orderhistory', {
+        let data = historydata.listOderedProducts;
+        const productdeatils = historydata.listOdered;
+        return res.status(200).json({
             data,
-            productdeatils: historydata.listOdered,
+            productdeatils,
         });
     }
     async getQuantityById(params, req, res) {
@@ -217,7 +214,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CartController.prototype, "displayCart", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_guard_1.AuthGuard),
     (0, common_1.Get)('history'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)()),

@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const forgetemail_service_1 = require("./forgetemail.service");
 const jwt_1 = require("@nestjs/jwt");
 const mailer_1 = require("@nestjs-modules/mailer");
+let otpGlobal = { otp: 0, email: '' };
 let ForgetemailController = class ForgetemailController {
     constructor(forgetemailService, jwtService, mailerService) {
         this.forgetemailService = forgetemailService;
@@ -43,32 +44,34 @@ let ForgetemailController = class ForgetemailController {
         }
         else {
             const SendEmailandThrowOpt = await this.forgetemailService.sendMaildata(Dto);
-            console.log('SendEmailandThrowOpt', SendEmailandThrowOpt);
             req.session.data = SendEmailandThrowOpt.token;
             req.session.email = SendEmailandThrowOpt.Email;
+            otpGlobal.otp = Number(SendEmailandThrowOpt.token);
+            otpGlobal.email = SendEmailandThrowOpt.Email;
             return res.status(200).json({
                 status: 200,
                 data: result,
                 message: `Enter OTP`,
-                otp: SendEmailandThrowOpt.token,
             });
         }
     }
     async getChangePassword(req, res, Data, session) {
-        const Opt = req.session.data;
-        const email = req.session.email;
-        const otpIsValid = req.session.otpIsValid;
+        const Otp = otpGlobal.otp;
+        const email = otpGlobal.email;
+        console.log('otpGlobal', otpGlobal);
         if (email) {
             const result = await this.forgetemailService.ChangePassword(Data, email);
             console.log('result', result);
             if (result.status == 400) {
                 return res.status(400).json({
                     status: 400,
-                    data: '',
+                    data: 'Otp not match',
                 });
             }
             else {
                 req.session.destroy();
+                delete otpGlobal.otp;
+                delete otpGlobal.email;
                 return res.status(200).json({
                     status: 200,
                     data: result,
@@ -77,23 +80,32 @@ let ForgetemailController = class ForgetemailController {
         }
     }
     async getcheckOtp(req, res, Dto, userEnterOtp, session) {
-        console.log(userEnterOtp);
-        const Opt = req.session.data;
-        if (Opt) {
-            const result = await this.forgetemailService.checkOtp(Opt, userEnterOtp);
-            if (result.status == 200) {
-                req.session.otpIsValid = true;
-                return res.status(200).json({
-                    status: 200,
-                    data: result,
-                });
+        try {
+            const Otp = otpGlobal.otp;
+            console.log(userEnterOtp, Otp);
+            if (Otp) {
+                const result = await this.forgetemailService.checkOtp(Otp, userEnterOtp);
+                if (result.status == 200) {
+                    req.session.otpIsValid = true;
+                    return res.status(200).json({
+                        status: 200,
+                        data: result,
+                    });
+                }
+                else {
+                    return res.status(400).json({
+                        status: 400,
+                        data: '',
+                    });
+                }
             }
-            else {
-                return res.status(400).json({
-                    status: 400,
-                    data: '',
-                });
-            }
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(400).json({
+                status: 400,
+                data: '',
+            });
         }
     }
 };
